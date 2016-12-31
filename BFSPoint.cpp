@@ -6,7 +6,11 @@
  */
 
 #include "BFSPoint.h"
+
+
 using namespace std;
+using namespace boost::archive;
+
 // gets a target pointer and 4 pointers, assign to target the first non NULL pointer(or NULL if
 // all pointers are NULL), then change the the first non NULL pointer to NULL.
 #define FIRST_NON_NULL_AND_CHANGE_TO_NULL(target, a, b, c, d)	{		\
@@ -30,8 +34,7 @@ using namespace std;
 										target = d;						\
 										d = NULL;						\
 									}									\
-								};										\
-
+								};							\
 
 BFSPoint::BFSPoint(int x, int y, BFSPoint* neighbor1, BFSPoint* neighbor2,
 		BFSPoint* neighbor3, BFSPoint* neighbor4) :
@@ -76,10 +79,14 @@ void BFSPoint::setNeighbors(BFSPoint * neighbor1, BFSPoint * neighbor2,
 {
 	numOfAdjacent = (neighbor1 != NULL) + (neighbor2 != NULL)
 			+ (neighbor3 != NULL) + (neighbor4 != NULL);
-	FIRST_NON_NULL_AND_CHANGE_TO_NULL(adjacent1, neighbor1, neighbor2, neighbor3, neighbor4);
-	FIRST_NON_NULL_AND_CHANGE_TO_NULL(adjacent2, neighbor1, neighbor2, neighbor3, neighbor4);
-	FIRST_NON_NULL_AND_CHANGE_TO_NULL(adjacent3, neighbor1, neighbor2, neighbor3, neighbor4);
-	FIRST_NON_NULL_AND_CHANGE_TO_NULL(adjacent4, neighbor1, neighbor2, neighbor3, neighbor4);
+	FIRST_NON_NULL_AND_CHANGE_TO_NULL(adjacent1, neighbor1, neighbor2,
+			neighbor3, neighbor4);
+	FIRST_NON_NULL_AND_CHANGE_TO_NULL(adjacent2, neighbor1, neighbor2,
+			neighbor3, neighbor4);
+	FIRST_NON_NULL_AND_CHANGE_TO_NULL(adjacent3, neighbor1, neighbor2,
+			neighbor3, neighbor4);
+	FIRST_NON_NULL_AND_CHANGE_TO_NULL(adjacent4, neighbor1, neighbor2,
+			neighbor3, neighbor4);
 }
 
 int BFSPoint::getX() const
@@ -96,19 +103,19 @@ void BFSPoint::adjacent(list<BFSObject*>& lst)
 {
 	switch (numOfAdjacent)
 	{
-	case 4:
-		lst.push_front(adjacent4);
-	case 3:
-		lst.push_front(adjacent3);
-	case 2:
-		lst.push_front(adjacent2);
-	case 1:
-		lst.push_front(adjacent1);
-		break;
-	default:
-	{
-		break;
-	}
+		case 4:
+			lst.push_front(adjacent4);
+		case 3:
+			lst.push_front(adjacent3);
+		case 2:
+			lst.push_front(adjacent2);
+		case 1:
+			lst.push_front(adjacent1);
+			break;
+		default:
+		{
+			break;
+		}
 	}
 }
 
@@ -166,3 +173,45 @@ Point BFSPoint::getPoint()
 {
 	return point;
 }
+
+template<class Archive>
+void BFSPoint::serialize(Archive & ar, const unsigned int version)
+{
+	//Call serialization from BFSObject which BFSPoint derives from.
+	ar & boost::serialization::base_object<BFSObject>(*this);
+	//Write to the archive stream members of this class.
+	ar & point;
+	ar & numOfAdjacent;
+	//Write the neighbors based on numOfAdjacent.
+	ar & adjacent1;
+	ar & adjacent2;
+	ar & adjacent3;
+	ar & adjacent4;
+//	for(int i = 0;i < numOfAdjacent;i++) {
+//		//Get current neighbor.
+//		FIRST_NON_NULL_AND_CHANGE_TO_NULL(current,adjacent1,adjacent2,adjacent3,adjacent4);
+//		//Write it down to the
+//		ar & current;
+//		//Set back adjacent to it's value.
+//		setBack(current,adjacent1,adjacent2,adjacent3,adjacent4);
+//	}
+}
+
+void BFSPoint::setBack(BFSPoint* value, BFSPoint* first, BFSPoint* second,
+		BFSPoint* third, BFSPoint* fourth)
+{
+	if (first == NULL && second != NULL)
+	{
+		first = value;
+	}
+	else if (second == NULL && third != NULL)
+	{
+		second = value;
+	}
+	else if (third == NULL && fourth != NULL)
+	{
+		third = value;
+	}
+}
+
+BOOST_CLASS_EXPORT(BFSObject);

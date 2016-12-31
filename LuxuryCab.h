@@ -8,10 +8,23 @@
 #ifndef SRC_LUXURYCAB_H_
 #define SRC_LUXURYCAB_H_
 #include "Cab.h"
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/export.hpp>
 
 class LuxuryCab : public Cab
 {
 private:
+	// friends
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive & ar, const unsigned int version)
+	{
+		ar & boost::serialization::base_object<Cab>(*this);
+		ar & price;
+	}
+protected:
 	unsigned int price;
 public:
 	LuxuryCab() :

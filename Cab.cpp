@@ -27,19 +27,8 @@ char Cab::getColor() const
 	return color;
 }
 
-BFSPoint* Cab::getLocation() const
-{
-	return location;
-}
-
 unsigned int Cab::getMovmentAbility()
 {
 	return movmentAbility;
 }
 
-void Cab::setLocation(const BFSPoint* point)
-{
-	delete location;
-	location = new BFSPoint(point->getX(), point->getY());
-}
- 

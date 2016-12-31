@@ -11,12 +11,35 @@
 #include "BFSObject.h"
 #include "Point.h"
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/export.hpp>
+
+
 class BFSPoint : public BFSObject
 {
 private:
 	Point point;
 	unsigned numOfAdjacent;
 	BFSPoint *adjacent1, *adjacent2, *adjacent3, *adjacent4;
+	friend class boost::serialization::access;
+	//Set back inline function that we will use during serialization.
+	inline void setBack(BFSPoint* value,BFSPoint* first,BFSPoint* second,BFSPoint* third,
+						BFSPoint* fourth);
 public:
 	/*
 	 * constructor method
@@ -104,6 +127,12 @@ public:
 	 */
 	friend std::ostream& operator<<(std::ostream& out,
 			const BFSPoint * const bp);
+	/*
+	 * Serialization method for BFSPoint class, we will use it while
+	 * transfering objects between the client and the server.
+	 */
+	template<class Archive>
+	void serialize(Archive & ar,const unsigned int version);
 };
 
 #endif /* BFSPOINT_H_ */
