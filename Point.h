@@ -11,6 +11,20 @@
 #include <iostream>
 #include <string>
 #include <cstdio>
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
 class Point
 {
 private:
@@ -19,6 +33,7 @@ private:
 	* returns the number of digits in an int
 	*/
 	inline unsigned numOfDigits(int n) const;
+	friend class boost::serialization::access;
 public:
 	/*
 	* constructor method
@@ -54,6 +69,12 @@ public:
 	* add the point to the stream as a string in the format (x,y).
 	*/
 	friend std::ostream& operator<<(std::ostream& out, const Point& p);
+	/*
+	 * Serialization of point class,we will use it while serializing other classes which
+	 * use the Point class.
+	 */
+	template<class Archive>
+	void serialize(Archive & ar,const unsigned int version);
 };
 
 #endif /* POINT_H_ */

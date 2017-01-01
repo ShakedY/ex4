@@ -8,7 +8,17 @@
 #ifndef SRC_CAB_H_
 #define SRC_CAB_H_
 #include "BFSPoint.h"
-
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 class Cab
 {
 // first public is just for enum defining
@@ -41,6 +51,7 @@ protected:
 	char color;
 	BFSPoint* location;
 	char manufacturer;
+	friend	class boost::serialization::access;
 public:
 	Cab() :
 			id(0), numOfKilometers(0), tariff(0), movmentAbility(0), color(
@@ -69,5 +80,8 @@ public:
 	BFSPoint* getLocation() const;
 	void setLocation(const BFSPoint* point);
 	virtual CabType getCabType() = 0;
+	virtual void moveOneStep(Point endPoint) = 0;
+	template<class Archive>
+	void serialize(Archive & ar,const unsigned int version);
 };
 #endif /* SRC_CAB_H_ */

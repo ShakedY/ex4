@@ -68,4 +68,10 @@ void BFSObject::BFS()
 		}
 	} while (!q.empty());
 }
+template<class Archive>
+void BFSObject::serialize(Archive & ar,const unsigned int version) {
+	ar & color;
+	ar & distance;
+	ar & parent;
+}
 

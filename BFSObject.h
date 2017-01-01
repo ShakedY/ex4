@@ -11,7 +11,19 @@
 #include <queue>
 #include <list>
 #include <string>
-
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 class BFSObject
 {
 // first public is just for enum types
@@ -24,6 +36,7 @@ protected:
 	Color color;
 	size_t distance;
 	BFSObject* parent;
+	friend class boost::serialization::access;
 public:
 	BFSObject() :
 			color(WHITE), distance(-1), parent(NULL)
@@ -57,6 +70,12 @@ public:
 	*/
 	void BFS();
 	virtual void adjacent(std::list<BFSObject*>& lst)=0;
+	/*
+	 * Serialization of this object,we will use it while serializing derived
+	 * classes.
+	 */
+	template<class Archive>
+	void serialize(Archive & ar,const unsigned int version);
 };
 
 #endif /* BFSOBJECT_H_ */

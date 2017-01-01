@@ -1,9 +1,4 @@
-/*
- * Point.cpp
- *
- *  Created on: Nov 16, 2016
- *      Author: adi
- */
+
 
 #include "Point.h"
 using namespace std;
@@ -61,4 +56,9 @@ ostream& operator <<(ostream& out, const Point& p)
 bool Point::operator ==(const Point& other) const
 {
 	return (x==other.x)&&(y==other.y);
+}
+template<class Archive>
+void Point::serialize(Archive & ar,const unsigned int version) {
+	ar & x;
+	ar & y;
 }

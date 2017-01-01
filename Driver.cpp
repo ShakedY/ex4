@@ -2,11 +2,30 @@
  * Driver.cpp
  *
  *  Created on: Dec 3, 2016
- *      Author: assaf
+ *      Author:
  */
 
 #include "Driver.h"
+
 using namespace std;
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
+using namespace std;
+using namespace boost::archive;
 
 Driver::Driver(const BFSPoint* loc, char stat, int id, int age,
 		int yearsOfExperience, Map *m) :
@@ -33,7 +52,11 @@ Driver::Driver(int id, int age, char stat, int yearsOfExperience, Cab* cab,
 	averageStisfaction = 0.0;
 	myCab = cab;
 	currentTrip = NULL;
-	location = m->getTheLocation(0, 0);
+	if (m != NULL){
+		location = m->getTheLocation(0, 0);
+	} else {
+		location = NULL;
+	}
 	this->id = id;
 	myMap = m;
 	this->yearsOfExperience = yearsOfExperience;
@@ -127,3 +150,18 @@ void Driver::stopWorking()
 	currentTrip = NULL;
 }
 
+Cab* Driver::getCab() {
+	return myCab;
+}
+Trip* Driver::getTrip() {
+	return currentTrip;
+}
+void Driver::moveOneStep(unsigned int time) {
+	//First we will check if the time is past the Trip's starting time.
+	if (currentTrip->getStartingTime() < time) {
+		//Do nothing.
+		return;
+	} else {
+		//We are past the starting time so moveOneStep.
+	}
+}

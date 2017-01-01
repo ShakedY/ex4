@@ -1,9 +1,4 @@
-/*
- * Trip.cpp
- *
- *  Created on: Dec 3, 2016
- *      Author: assaf
- */
+
 
 #include "Trip.h"
 using namespace std;
@@ -64,4 +59,6 @@ void Trip::setIsTaken()
 {
 	isTaken = true;
 }
-
+int Trip::getStartingTime() {
+	return startingTime;
+}

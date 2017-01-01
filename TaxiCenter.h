@@ -25,9 +25,10 @@ private:
 	std::list<Cab*> cabs;
 	std::list<Trip*> trips;
 	Map* map;
+	unsigned int time;
 public:
 	TaxiCenter(Map *m) :
-		drivers(), cabs(), trips(), map(m)
+		drivers(), cabs(), trips(), map(m),time(0)
 	{
 		std::list<Cab*> cabs;
 		std::list<Driver*> drivers;
@@ -52,6 +53,11 @@ public:
 	std::list<Driver*> getDriversList() const;
 	std::list<Cab*> getCabsList() const;
 	Cab* getCab(int cabId) const;
+	//Set number of drivers based on input server got.
+	void setNumDrivers(int num);
+	//Get current time of our world.
+	int getCurrentTime();
+	void moveAllOneStep();
 };
 
 #endif /* SRC_TAXICENTER_H_ */

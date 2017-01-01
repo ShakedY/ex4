@@ -9,10 +9,11 @@
 #define SRC_STANDARDCAB_H_
 #include "Cab.h"
 
-class StandardCab: public Cab
+class StandardCab : public Cab
 {
 private:
 	unsigned int price;
+	friend	class boost::serialization::access;
 public:
 	StandardCab() :
 			price(0)
@@ -40,6 +41,8 @@ public:
 
 	int getPrice() const;
 	Cab::CabType getCabType();
+	template<class Archive>
+	void serialize(Archive & ar,unsigned int version);
+	void moveOneStep(Point endPoint);
 };
-
 #endif /* SRC_STANDARDCAB_H_ */

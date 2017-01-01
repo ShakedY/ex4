@@ -20,16 +20,17 @@ private:
 	double tariff;
 	std::list<const Passenger*> passengers;
 	bool isTaken;
+	unsigned int startingTime;
 public:
 	Trip() :
 			rideId(0), meters(0), numOfPassengers(0), startPoint(0,0), endPoint(0,0), tariff(
-					0.0), passengers(), isTaken(false)
+					0.0), passengers(), isTaken(false),startingTime(0)
 	{
 	}
 	;
 	Trip(int id, int numOfPass, BFSPoint *start, BFSPoint *end,
-			double tar) :
-				startPoint(0,0), endPoint(0,0), passengers()
+			double tar, unsigned int startingTime) :
+				startPoint(0,0), endPoint(0,0), passengers(),startingTime(startingTime)
 	{
 		rideId = id;
 		meters = 0;
@@ -63,6 +64,7 @@ public:
 	bool isTripTaken() const;
 	void setIsTaken();
 	void movedPoint(unsigned int distance);
+	int getStartingTime();
 };
 
 #endif /* SRC_TRIP_H_ */

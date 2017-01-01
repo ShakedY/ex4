@@ -30,8 +30,7 @@ using namespace std;
 										target = d;						\
 										d = NULL;						\
 									}									\
-								};										\
-
+								};							\
 
 BFSPoint::BFSPoint(int x, int y, BFSPoint* neighbor1, BFSPoint* neighbor2,
 		BFSPoint* neighbor3, BFSPoint* neighbor4) :
@@ -165,4 +164,35 @@ ostream& operator<<(ostream& out, const BFSPoint * const bp)
 Point BFSPoint::getPoint()
 {
 	return point;
+}
+template<class Archive>
+void BFSPoint::serialize(Archive & ar,const unsigned int version) {
+	//Call serialization from BFSObject which BFSPoint derives from.
+	ar & boost::serialization::base_object<BFSObject>(*this);
+	//Write to the archive stream members of this class.
+	ar & point;
+	ar & numOfAdjacent;
+	//Write the neighbors based on numOfAdjacent.
+	BFSPoint* current;
+	for(int i = 0;i < numOfAdjacent;i++) {
+		//Get current neighbor.
+		FIRST_NON_NULL_AND_CHANGE_TO_NULL(current,adjacent1,adjacent2,adjacent3,adjacent4);
+		//Write it down to the
+		ar & current;
+		//Set back adjacent to it's value.
+		setBack(current,adjacent1,adjacent2,adjacent3,adjacent4);
+	}
+
+}
+void BFSPoint::setBack(BFSPoint* value,BFSPoint* first,BFSPoint* second,
+		BFSPoint* third,BFSPoint* fourth) {
+		if (first == NULL && second != NULL) {
+			first = value;
+		}
+		else if (second == NULL && third != NULL) {
+			second = value;
+		}
+		else if (third == NULL && fourth != NULL) {
+			third = value;
+		}
 }
