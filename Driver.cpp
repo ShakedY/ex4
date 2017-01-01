@@ -58,6 +58,7 @@ Driver::Driver(int id, int age, char stat, int yearsOfExperience, Cab* cab,
 	}
 	else
 	{
+
 		location = NULL;
 	}
 	this->id = id;

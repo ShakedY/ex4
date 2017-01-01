@@ -1,9 +1,4 @@
-/*
- * MainFlowAnalizer.cpp
- *
- *  Created on: Dec 3, 2016
- *      Author: assaf
- */
+
 
 #include "MainFlowAnalizer.h"
 #include <stdlib.h>
@@ -96,10 +91,10 @@ void MainFlowAnalizer::mainLoop(StringInput& info)
 					cout << "No driver with this id" << endl;
 				break;
 			case 6:
-				(*center).attachCabsToDrivers();
-				(*center).attachDriversToTrips();
+				center->attachCabsToDrivers();
+				center->attachDriversToTrips();
 //				(*center).startWorking();
-				(*center).endWorking();
+				center->endWorking();
 				break;
 //			case 7:
 //				break;

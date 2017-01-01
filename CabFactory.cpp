@@ -13,6 +13,7 @@ CabFactory::CabFactory() {
 
 Cab* CabFactory::generateCab(int id, Cab::CabType cabType, Cab::cabColor color, Cab::Manufacturer man) {
 	Cab* newCab = NULL;
+	//Use the cabType enum to identify which cab to create.
 	if (cabType == Cab::LUXURY)
 	{
 		newCab = new LuxuryCab(id, color, man);

@@ -12,6 +12,7 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/export.hpp>
 
+
 class LuxuryCab : public Cab
 {
 private:
@@ -26,6 +27,7 @@ private:
 	}
 protected:
 	unsigned int price;
+	friend	class boost::serialization::access;
 public:
 	LuxuryCab() :
 		price(0)
@@ -50,6 +52,14 @@ public:
 
 	int getPrice() const;
 	Cab::CabType getCabType();
+	template<class Archive>
+	void serialize(Archive & ar,const unsigned int version);
+	/*
+	 * Function that moves the cab by one step,we will use the endPoint in the input
+	 * in the specific case when the cab is one step from the endPoint and instead of
+	 * moving 2 steps it will only move one.
+	 */
+	void moveOneStep(Point endPoint);
 };
 
 #endif /* SRC_LUXURYCAB_H_ */

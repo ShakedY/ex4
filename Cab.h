@@ -59,6 +59,7 @@ protected:
 	unsigned int movmentAbility;
 	char color;
 	char manufacturer;
+	friend	class boost::serialization::access;
 public:
 	Cab() :
 			id(0), numOfKilometers(0), tariff(0), movmentAbility(0), color(
@@ -86,6 +87,9 @@ public:
 	int getKilometerage() const;
 	char getColor() const;
 	virtual CabType getCabType() = 0;
+	virtual void moveOneStep(Point endPoint) = 0;
+	template<class Archive>
+	void serialize(Archive & ar,const unsigned int version);
 };
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(Cab);

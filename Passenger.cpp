@@ -1,9 +1,3 @@
-/*
- * Passenger.cpp
- *
- *  Created on: Dec 3, 2016
- *      Author: assaf
- */
 
 #include "Passenger.h"
 #include <cstdlib>

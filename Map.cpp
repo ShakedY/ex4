@@ -1,9 +1,4 @@
-/*
- * Map.cpp
- *
- *  Created on: Dec 3, 2016
- *      Author: assaf
- */
+
 
 #include "Map.h"
 #include <stdlib.h>
@@ -223,7 +218,7 @@ Map::Map(unsigned int width, unsigned int height)
 Trip* Map::calcTrip(const BFSPoint& source, const BFSPoint& destination)
 {
 	BFSPoint *src = getTheLocation(source), *dst = getTheLocation(destination);
-	Trip *trip = new Trip(rand(), 0, src, dst, 49.99); // only 49.99! sale!!
+	Trip *trip = new Trip(rand(), 0, src, dst, 49.99, 0); // only 49.99! sale!!
 	return trip;
 }
 

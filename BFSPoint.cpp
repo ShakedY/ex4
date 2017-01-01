@@ -177,6 +177,7 @@ Point BFSPoint::getPoint()
 template<class Archive>
 void BFSPoint::serialize(Archive & ar, const unsigned int version)
 {
+
 	//Call serialization from BFSObject which BFSPoint derives from.
 	ar & boost::serialization::base_object<BFSObject>(*this);
 	//Write to the archive stream members of this class.
@@ -215,3 +216,4 @@ void BFSPoint::setBack(BFSPoint* value, BFSPoint* first, BFSPoint* second,
 }
 
 BOOST_CLASS_EXPORT(BFSObject);
+

@@ -44,7 +44,6 @@ private:
 	std::list<const BFSPoint*> road;
 	std::list<const BFSPoint*>::iterator currentPosition;
 	bool isTaken;
-
 	friend class boost::serialization::access;
 
 	template<class Archive>

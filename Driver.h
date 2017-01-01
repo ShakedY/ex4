@@ -41,7 +41,6 @@ class Driver
 {
 private:
 	friend class boost::serialization::access;
-	friend class RemoteDriver;
 	friend class Client;
 
 	template<class Archive>
@@ -74,7 +73,6 @@ protected:
 	const BFSPoint *location;
 	Map* myMap;
 	std::list<const Passenger*> passengers;
-	std::list<const BFSPoint*> road;
 
 public:
 	virtual ~Driver()

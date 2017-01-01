@@ -1,9 +1,3 @@
-/*
- * TaxiCenter.cpp
- *
- *  Created on: Dec 3, 2016
- *      Author: assaf
- */
 
 #include "TaxiCenter.h"
 #include <list>
@@ -222,4 +216,14 @@ void TaxiCenter::endWorking()
 			(*itDrivers)->stopWorking();
 		}
 	}
+}
+void TaxiCenter::setNumDrivers(int num) {
+	//Set fixed list size with num.
+	const size_t listSize(num);
+	list<Driver*> driversList(listSize);
+	//Set our drivers list to be of this specific size.
+	drivers = driversList;
+}
+int TaxiCenter::getCurrentTime() {
+	return time;
 }

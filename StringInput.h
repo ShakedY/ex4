@@ -19,6 +19,7 @@ class StringInput {
 //	int getNumber(std::string info);
 //	double getDoubleNumber(std::string info);
 public:
+	//Create structs that will define the info we will get from the user about each object.
 	typedef struct mapInfo
 	{
 		int height;
@@ -32,7 +33,7 @@ public:
 	} DriverInfo;
 	typedef struct TripInfo
 	{
-		int id, x_start, y_start, x_end, y_end, num_passengers;
+		int id, x_start, y_start, x_end, y_end, num_passengers,time;
 		double tariff;
 	} TripInfo;
 	typedef struct CabInfo
