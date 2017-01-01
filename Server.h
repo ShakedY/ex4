@@ -9,8 +9,10 @@
 #define SERVER_H_
 #include <string>
 #include "StringInput.h"
-#include "Socket.h"
-#include "Udp.h"
+#include "sockets/Udp.h"
+#include "CabFactory.h"
+#include "Driver.h"
+#include "RemoteDriver.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/tokenizer.hpp>
@@ -31,6 +33,7 @@ private:
 	Socket* socket;
 	TaxiCenter* center;
 	Map* map;
+	bool connectedToClient;
 	CabFactory factory;
 public:
 	Server();
@@ -68,7 +71,7 @@ public:
 	 * vehicle and send it to the client.This function will deserialize
 	 * the output.
 	 */
-	Driver* getDriverFromClient(string serialized);
+	Driver* getDriverFromClient();
 	/*
 	 * Get the number of drivers from the user and create the correct list accordingly
 	 */
@@ -77,8 +80,20 @@ public:
 	 * After getting a driver from the client we want to send
 	 * a serialized cab back to the client.
 	 */
-	void sendVehicleToClient(Cab* cab);
+	void sendVehicleToClients();
+	//Send a Trip to the Driver
+	void sendTrip();
 	TaxiCenter* getTaxiCenter();
+	template<class T>
+	/*
+	 * General function to serialize and deserialize an object,
+	 * we will use a template so that we could use these functions
+	 * to serialize and deserialize plenty of objects cause the code
+	 * is the same for all of them.
+	 */
+	void serializeObj(std::string* serial_str, T* obj);
+	template<class T>
+	T* deSerializeObj(const char* serial_str, int size);
 };
 
 #endif /* SERVER_H_ */
