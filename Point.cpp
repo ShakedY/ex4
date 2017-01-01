@@ -57,6 +57,7 @@ bool Point::operator ==(const Point& other) const
 {
 	return (x==other.x)&&(y==other.y);
 }
+
 template<class Archive>
 void Point::serialize(Archive & ar,const unsigned int version) {
 	ar & x;

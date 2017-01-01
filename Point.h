@@ -42,6 +42,10 @@ public:
 	*/
 	Point(int xAxis, int yAxis);
 	/*
+	 * Default constructor.
+	 */
+	Point(): x(0), y(0){};
+	/*
 	* return x axis
 	*/
 	int getX() const;

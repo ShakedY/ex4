@@ -24,6 +24,8 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+
+
 class BFSObject
 {
 // first public is just for enum types
@@ -78,4 +80,5 @@ public:
 	void serialize(Archive & ar,const unsigned int version);
 };
 
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(BFSObject);
 #endif /* BFSOBJECT_H_ */

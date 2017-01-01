@@ -11,6 +11,7 @@
 #include "BFSObject.h"
 #include "Point.h"
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <boost/archive/text_oarchive.hpp>
@@ -24,6 +25,10 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/export.hpp>
+
 
 class BFSPoint : public BFSObject
 {
