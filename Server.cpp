@@ -60,9 +60,9 @@ void Server::mainLoop(StringInput& info)
 	const BFSPoint* location;
 	do
 	{
-		cout << "Insert another option" << endl;
-		scanf("%d", &answer);
-		scanf("%c",&junk);
+		//cout << "Insert another option" << endl;
+		scanf("%d%c", &answer,&junk);
+		//scanf("%c",&junk);
 		switch (answer)
 		{
 			case 1:
@@ -96,7 +96,10 @@ void Server::mainLoop(StringInput& info)
 				break;
 			case 9:
 				//In this case the after assigning the trips.
+				center->attachDriversToTrips();
 				center->moveAllOneStep();
+				cout << "Current clock time:  " << center->getCurrentTime() << endl;
+				//scanf("%c",&junk);
 				break;
 			default:
 				// no such option
@@ -110,7 +113,7 @@ void Server::getNumDrivers()
 	cout <<"Getting number of drivers" << endl;
 	int numDrivers, size;
 	char buffer[BUFFSIZE];
-	RemoteDriver  currentDriver;
+	RemoteDriver*  currentDriver;
 	Driver *drv;
 	//Set boolean to be true to know we already connected to the client.
 	connectedToClient = true;
@@ -119,34 +122,23 @@ void Server::getNumDrivers()
 	scanf("%d",&numDrivers);
 	//Now we expect to get the drivers through the socket and send them cabs.
 	while(numDrivers-- != 0) {
-		cout <<"Before getting driver" << endl;
 		// Deserialize the data.
 		size = socket->reciveData(buffer, BUFFSIZE);
-		cout <<"Before deserialize" << endl;
 		drv = deSerializeObj<Driver>(buffer, size);
-		cout << "ID: " << drv->getId() << endl;
-		cout <<"Got remote" << endl;
-		currentDriver = RemoteDriver(drv, new Udp(1,8000));
-		cout <<"Right after" << endl;
-		//delete drv;
-		cout <<"After creation" << endl;
-		center->addDriver(&currentDriver);
+		currentDriver = new RemoteDriver(drv,socket);
+		delete drv;
+		center->addDriver(currentDriver);
 	}
 	cout <<"Here got driver" << endl;
 	// Add to the driver the fitting cab from the TaxiCenter.
 	cout << "Attaching cabs" << endl;
 	center->attachCabsToDrivers();
-	cout <<"Attaching trips" << endl;
-	center->attachDriversToTrips();
 	cout << "Send vehicles" << endl;
 	// Now send the cab back to the client.
-	sendVehicleToClients();
-	cout <<"Send trips " << endl;
-	//Send the trips to the clients.
-	sendTrip();
-	cout <<"After sending the trips" << endl;
+	 //sendVehicleToClients();
+	cout <<"Ended sending vehicles " << endl;
 }
-void Server::sendTrip() {
+/*void Server::sendTrip() {
 	//If we are already connected to the driver,send a Trip do nothing otherwise.
 	if (connectedToClient) {
 	string serial_str;
@@ -164,8 +156,8 @@ void Server::sendTrip() {
 		}
 	}
 	}
-}
-void Server::sendVehicleToClients() {
+}*/
+/*void Server::sendVehicleToClients() {
 	string serial_str;
 	list<const Driver*>* employee_list = center->getDrivers();
 	list<const Driver*>::iterator it = employee_list->begin(), end = employee_list->end();
@@ -177,7 +169,7 @@ void Server::sendVehicleToClients() {
 		socket->sendData(serial_str); // TODO addresses support
 		cout <<"After sending" << endl;
 	}
-}
+}*/
 
 template<class T>
 void Server::serializeObj(std::string* serial_str, T* obj)
