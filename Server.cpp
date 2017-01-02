@@ -62,8 +62,6 @@ void Server::mainLoop(StringInput& info)
 			case 2:
 				//Case 2,get Trip from the console and add it to the TaxiCenter.
 				info.getTripInfo();
-//				//Attach the trips to the drivers(if there are any).
-//				center->attachDriversToTrips();
 				tmp = createTrip(info.tripInfo);
 				center->addTrip(tmp);
 				break;
@@ -76,9 +74,9 @@ void Server::mainLoop(StringInput& info)
 				//Case 4,get id of driver and print it's location.
 				scanf("%d", &driver_id);
 				location = center->getDriverLocation(driver_id);
-
-				if (location != NULL)
+				if (location != NULL) {
 					cout << *location << endl;
+				}
 				break;
 			case 9:
 				//Tell the TaxiCenter to move all the drivers by one step.

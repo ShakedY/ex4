@@ -26,11 +26,9 @@
 #include <boost/archive/binary_iarchive.hpp>
 
 /*
- * This is the BFSObject,this class will be abstract and will have a pure virtual function,
- * this class will represent a general location on a map that will be able to run the BFS
- * algorithm to get path's through it's map.We won't really use this class in the code but
- * the classes that will be derived from it.
- */
+*This BFSObject will be use to describe a point that
+* will use the bfs algorithm.
+*/
 class BFSObject
 {
 // first public is just for enum types
@@ -45,7 +43,6 @@ protected:
 	BFSObject* parent;
 	friend class boost::serialization::access;
 public:
-	//Default constructor,we used delegations to set the private members.
 	BFSObject() :
 			color(WHITE), distance(-1), parent(NULL)
 	{
@@ -77,12 +74,6 @@ public:
 	*  Ronald L. Rivest, and Clifford Stein.
 	*/
 	void BFS();
-	/*
-	 * This method will get a list of BFSObjects and fill it with the
-	 * adjacent BFSObjects to this one,we will implement it in the class
-	 * that derives from this class so it will be a pure virtual function
-	 * for now.
-	 */
 	virtual void adjacent(std::list<BFSObject*>& lst)=0;
 	/*
 	 * Serialization of this object,we will use it while serializing derived
