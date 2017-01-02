@@ -29,21 +29,15 @@ class StringInput;
 
 class Server {
 private:
+	CabFactory factory;
 	//Socket which we will use to interact with the client.
 	Socket* socket;
 	TaxiCenter* center;
 	Map* map;
-	bool connectedToClient;
-	CabFactory factory;
 public:
 	Server();
 	Server(int argc,char* argv[]);
 	virtual ~Server();
-	/*
-	 * This function will create the TaxiCenter before the server starts interacting
-	 * with the client.
-	 */
-	void createTaxiCenter();
 	/*
 	 * This function will create a cab for the driver, after
 	 * the driver will be sent from the client.
@@ -83,7 +77,6 @@ public:
 	void sendVehicleToClients();
 	//Send a Trip to the Driver
 	void sendTrip();
-	TaxiCenter* getTaxiCenter();
 	template<class T>
 	/*
 	 * General function to serialize and deserialize an object,

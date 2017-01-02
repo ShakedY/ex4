@@ -31,3 +31,4 @@ unsigned int Cab::getMovmentAbility()
 {
 	return movmentAbility;
 }
+

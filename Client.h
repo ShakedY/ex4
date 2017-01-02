@@ -13,18 +13,17 @@ class CabFactory;
 class TaxiCenter;
 class ClientInput;
 
-class Client {
+class Client
+{
 private:
 	Socket* mySocket;
 	Driver* driver;
 	Cab* cab;
 	Trip* trip;
 public:
-	typedef enum {
-		moveOneStep = 0,
-		setTrip = 1,
-		endedTrip = 2,
-		shutDown = 3
+	typedef enum
+	{
+		moveOneStep = 0, setTrip = 1, endedTrip = 2, shutDown = 3
 	} Actions;
 	Client(int argc, char* argv[]);
 	virtual ~Client();
@@ -32,8 +31,9 @@ public:
 	void printMenu();
 	void work();
 	void getTripFromServer();
-	void moveInTrip();
+//	void moveInTrip();
 	void waitForTrip();
+	void run();
 
 	template<class T>
 	void serializeObj(std::string* serial_str, T* obj);

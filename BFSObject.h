@@ -77,7 +77,11 @@ public:
 	 * classes.
 	 */
 	template<class Archive>
-	void serialize(Archive & ar,const unsigned int version);
+	void serialize(Archive & ar,const unsigned int version) {
+		ar & color;
+		ar & distance;
+		ar & parent;
+	}
 };
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(BFSObject);

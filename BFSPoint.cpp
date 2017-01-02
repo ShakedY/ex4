@@ -163,40 +163,34 @@ ostream& operator<<(ostream& out, const BFSPoint& bp)
 	return out;
 }
 
+void BFSPoint::BFSInitializationFrom2DArray(BFSPoint* nodes, unsigned int dimX,
+		unsigned int dimY, unsigned rowLen)
+{
+	BFSPoint *p;
+	unsigned size = dimY * rowLen;
+	for (unsigned int i = 0; i < size; i += rowLen)
+	{
+		p = nodes + i;
+		for (unsigned int j = 0; j < dimX; ++j)
+		{
+			p[j].color = BFSObject::WHITE;
+			p[j].distance = -1;
+			p[j].parent = NULL;
+		}
+	}
+}
+
 ostream& operator<<(ostream& out, const BFSPoint * const bp)
 {
 	out << bp->point;
 	return out;
 }
 
-Point BFSPoint::getPoint()
+const Point& BFSPoint::getPoint() const
 {
 	return point;
 }
 
-template<class Archive>
-void BFSPoint::serialize(Archive & ar, const unsigned int version)
-{
-
-	//Call serialization from BFSObject which BFSPoint derives from.
-	ar & boost::serialization::base_object<BFSObject>(*this);
-	//Write to the archive stream members of this class.
-	ar & point;
-	ar & numOfAdjacent;
-	//Write the neighbors based on numOfAdjacent.
-	ar & adjacent1;
-	ar & adjacent2;
-	ar & adjacent3;
-	ar & adjacent4;
-//	for(int i = 0;i < numOfAdjacent;i++) {
-//		//Get current neighbor.
-//		FIRST_NON_NULL_AND_CHANGE_TO_NULL(current,adjacent1,adjacent2,adjacent3,adjacent4);
-//		//Write it down to the
-//		ar & current;
-//		//Set back adjacent to it's value.
-//		setBack(current,adjacent1,adjacent2,adjacent3,adjacent4);
-//	}
-}
 
 void BFSPoint::setBack(BFSPoint* value, BFSPoint* first, BFSPoint* second,
 		BFSPoint* third, BFSPoint* fourth)
@@ -216,4 +210,3 @@ void BFSPoint::setBack(BFSPoint* value, BFSPoint* first, BFSPoint* second,
 }
 
 BOOST_CLASS_EXPORT(BFSObject);
-

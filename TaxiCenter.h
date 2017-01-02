@@ -12,8 +12,10 @@
 #include "BFSPoint.h"
 #include "Cab.h"
 #include "Map.h"
+#include "Trip.h"
 #include "Passenger.h"
 #include "Driver.h"
+class Trip;
 class Driver;
 class Passenger;
 class Map;
@@ -28,7 +30,7 @@ private:
 	unsigned int time;
 public:
 	TaxiCenter(Map *m) :
-		drivers(), cabs(), trips(), map(m),time(0)
+			drivers(), cabs(), trips(), map(m), time(0)
 	{
 		std::list<Cab*> cabs;
 		std::list<Driver*> drivers;
@@ -41,23 +43,28 @@ public:
 	void addTrip(Trip* trip);
 	void addDrivers(std::list<Driver*> drivs);
 	void addCabs(std::list<Cab*> cabs);
-	void sendTaxi(const BFSPoint* source, const BFSPoint* destination);
-	const BFSPoint* getDriverLocation(int driverId);// const;
+	Trip* tripAtLocation(const BFSPoint* location);
 	void attachMaptoDrivers(Map* map);
 	void attachDriversToTrips();
 	void attachCabsToDrivers();
 //	void startWorking();
 	void endWorking();
+	void sendTaxi(const BFSPoint* source, const BFSPoint* destination);
 	void sendTaxi(Passenger* passenger);
 //	bool checkingIfDriving(Driver* driver);// const;
+	const Point* getDriverLocation(int driverId) const;
 	std::list<Driver*> getDriversList() const;
 	std::list<Cab*> getCabsList() const;
 	Cab* getCab(int cabId) const;
-	//Set number of drivers based on input server got.
-	void setNumDrivers(int num);
+//	//Set number of drivers based on input server got.
+//	void setNumDrivers(int num);
 	//Get current time of our world.
 	int getCurrentTime();
 	void moveAllOneStep();
+	// like a list of worker at an company
+	std::list<const Driver*>* getDrivers() const;
+	//Get the list of current Trips.
+	//std::list<const Trip*>* getTrips() const;
 };
 
 #endif /* SRC_TAXICENTER_H_ */

@@ -21,7 +21,7 @@ using namespace boost::archive;
 
 Client::Client(int argc, char* argv[])
 {
-	//Choose socket to run on port 110000, enter false
+	// Choose socket to run on port 110000, enter false
 	// because it's not a server, no need to bind.
 	mySocket = new Udp(0, 8000);
 	driver = NULL;
@@ -35,28 +35,39 @@ Client::~Client()
 {
 	delete driver;
 	delete cab;
-	const list<const BFSPoint*>& road = trip->getRoad();
-	list<const BFSPoint*>::const_iterator it = road.begin(), end = road.end();
-	while (it != end)
-	{
-		// same as:
-		// delete *it_cabs;
-		// it_cabs++;
-		delete *it++;
-	}
-	if (trip != NULL) {
-		delete trip;
-	}
 	//Call socket's destructor to close it.
 	delete mySocket;
+}
+
+void Client::run()
+{
+	char action = -1;
+	do
+	{
+		mySocket->reciveData(&action, 1);
+		switch (action)
+		{
+			case moveOneStep:
+				driver->moveOneStep();
+				break;
+			case setTrip:
+				getTripFromServer();
+				break;
+			case shutDown:
+				break;
+			default:
+				// no such operator
+				break;
+		}
+	} while (action != shutDown);
+	mySocket->sendData('a');
 }
 
 void Client::buildDriver()
 {
 	string serial_str;
 	int id, cabId, age, yearsOfExperience, bytes;
-	char stat,action;
-	char buffer[BUFFSIZE];
+	char buffer[BUFFSIZE], stat;
 	
 	//-------------------------get driver's members as input---------------
 	scanf("%d,%d,%c,%d,%d", &id, &age, &stat, &yearsOfExperience, &cabId);
@@ -66,114 +77,116 @@ void Client::buildDriver()
 	this->serializeObj<Driver>(&serial_str, driver);
 
 	// Send serialized string through the socket.
-	cout <<"Sending" << endl;
 	mySocket->sendData(serial_str);
 
 	// Now the client will wait to receive the cab from the server.
 	bytes = mySocket->reciveData(buffer, BUFFSIZE);
 	cab = deSerializeObj<Cab>(buffer, bytes - 1);
 	driver->setCab(cab);
-	//Get action of setTrip from server before setting the trip.
-	mySocket->reciveData(&action,1);
+
+	// Get action of setTrip from server before setting the trip.
+	mySocket->reciveData(buffer, 1);
+
 	//Get the trip from the server.
 	getTripFromServer();
 }
-void Client::getTripFromServer() {
+
+void Client::getTripFromServer()
+{
 	// Now the client will wait to receive the trip from the server.
-	int bytes;
 	char buffer[BUFFSIZE];
-	bytes = mySocket->reciveData(buffer, BUFFSIZE);
+	int bytes = mySocket->reciveData(buffer, BUFFSIZE);
+	// -1 because the socket added '\0' at the end
 	trip = deSerializeObj<Trip>(buffer, bytes - 1);
 	driver->setTrip(trip);
-	cout << "Got my trip" << endl;
-	cout <<"Start point: " << trip->getStart() << "  end Point: " << trip->getEnd() << endl;
-	moveInTrip();
-
 }
+
 void Client::printMenu()
 {
 	cout << "Insert driver (id,age,status,experience,vehicle_id) " << endl;
 }
-void Client::moveInTrip() {
-	const BFSPoint *end = trip->getRoadEnd();
-		char action, buff[BUFFSIZE];
-		unsigned int time;
-		do
-		{
-			// TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
-			mySocket->reciveData(&action, 1);
-			cout <<"Received data" << endl;
-			if (action == (char)moveOneStep)
-			{
-				cout <<"Moving one step from client's message" << endl;
-				mySocket->reciveData(buff, 4);
-				cout << "Received time" << endl;
-				time = atoi(buff);
-				cout <<"Current time" << time << endl;
-				driver->moveOneStep(time);
-				cout << "MOVED" << endl;
-			}
-		} while(action != (char)shutDown && end != driver->location);
-	if (action != (char)shutDown) {
-		cout <<"Here at end of first" << endl;
-		waitForTrip();
-	}
-	return;
-}
-void Client::waitForTrip() {
+
+//void Client::moveInTrip()
+//{
+//	const Point* end = &(trip->getEnd());
+//	char action;
+//	mySocket->reciveData(&action, 1);
+//	while (action == (char) moveOneStep || end != driver->location)
+//	{
+//		driver->moveOneStep();
+//		// TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
+//		mySocket->reciveData(&action, 1);
+//	}
+////	do
+////	{
+////		// TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
+////		mySocket->reciveData(&action, 1);
+////		cout << "Received data" << endl;
+////		if (action == (char) moveOneStep)
+////		{
+////			driver->moveOneStep();
+////		}
+////	} while (action != (char) shutDown && end != driver->location);
+//}
+
+void Client::waitForTrip()
+{
 	//Delete the trip we ended and set it to null afterwards.
 	//First let the server know we ended the trip.
-	char action = endedTrip,endingAction;
+	char action = endedTrip, endingAction;
 	//Let server know trip is done.
 	mySocket->sendData(&action);
 	//Delete our trip and set it to NULL afterwards.
 	delete trip;
 	trip = NULL;
 	//Server will tell us to shut down or set new trip.
-	mySocket->reciveData(&endingAction,1);
-	if (action == (char)shutDown) {
+	mySocket->reciveData(&endingAction, 1);
+	if (action == (char) shutDown)
+	{
 		//Case of a shutdown return.
 		return;
-	} else {
+	}
+	else
+	{
 		//Other case,wait for a new server.
 		getTripFromServer();
 	}
 
 }
 /*void Client::work()
-{
-	const BFSPoint *end = trip->getRoadEnd();
-	char action, buff[BUFFSIZE];
-	unsigned int time;
-	do
-	{
-		// TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
-		mySocket->reciveData(&action, 1);
-		cout <<"Received data" << endl;
-		if (action == (char)moveOneStep)
-		{
-			cout <<"Moving one step from client's message" << endl;
-			mySocket->reciveData(buff, 4);
-			cout << "Received time" << endl;
-			time = atoi(buff);
-			cout <<"Current time" << time << endl;
-			driver->moveOneStep(time);
-			cout << "MOVED" << endl;
-		}
-	} while(action != (char)shutDown && end != driver->location);
-	// TODO replace this ugly shit. It's here to prevent the server from
-	// sending to a socket
-	if (action != (char)shutDown)
-	{
-		do
-		{
-			// TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
-			action =
-			mySocket->reciveData(&action, 1);
-		} while(action != (char)shutDown);
-	}
-	//Get here when shutdown was sent.
-}*/
+ {
+ const BFSPoint *end = trip->getRoadEnd();
+ char action, buff[BUFFSIZE];
+ unsigned int time;
+ do
+ {
+ // TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
+ mySocket->reciveData(&action, 1);
+ cout <<"Received data" << endl;
+ if (action == (char)moveOneStep)
+ {
+ cout <<"Moving one step from client's message" << endl;
+ mySocket->reciveData(buff, 4);
+ cout << "Received time" << endl;
+ time = atoi(buff);
+ cout <<"Current time" << time << endl;
+ driver->moveOneStep(time);
+ cout << "MOVED" << endl;
+ }
+ } while(action != (char)shutDown && end != driver->location);
+ // TODO replace this ugly shit. It's here to prevent the server from
+ // sending to a socket
+ if (action != (char)shutDown)
+ {
+ do
+ {
+ // TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
+ action =
+ mySocket->reciveData(&action, 1);
+ } while(action != (char)shutDown);
+ }
+ //Get here when shutdown was sent.
+ }*/
 
 template<class T>
 void Client::serializeObj(std::string* serial_str, T* obj)
@@ -201,5 +214,6 @@ T* Client::deSerializeObj(const char* serial_str, int size)
 int main(int argc, char* argv[])
 {
 	Client driver(argc, argv);
+	driver.run();
 	return 0;
 }

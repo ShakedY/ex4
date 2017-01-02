@@ -14,6 +14,18 @@ RemoteDriver::RemoteDriver(const BFSPoint* loc, char stat, int id, int age,
 	soc = socket;
 }
 
+RemoteDriver::RemoteDriver(Driver *drv, Socket *socket) :
+		Driver()
+{
+	location = drv->location;
+	status = drv->status;
+	id = drv->id;
+	age = drv->age;
+	yearsOfExperience = drv->yearsOfExperience;
+	myMap = drv->myMap;
+	soc = socket;
+}
+
 template<class T> string RemoteDriver::serializeObj(T* obj)
 {
 	std::string serial_str;
@@ -46,58 +58,35 @@ void RemoteDriver::setCab(Cab* cab)
 
 void RemoteDriver::setTrip(Trip* trip)
 {
-	char action = (char)Client::setTrip;
+	delete currentTrip;
 	currentTrip = trip;
-	//Set trip to be taken.
-	cout <<"HERE?" << endl;
-	trip->setIsTaken();
-	location = trip->getRoadStart();
-	cout <<"Here???" << endl;
-	// TODO support this in the future
-	//	soc->sendData((char)Client::Actions::setTrip + serializeObj(trip));
-	soc->sendData(&action);
-	cout <<"After here" << endl;
+	location = &(currentTrip->getStart());
+	dest = &(currentTrip->getEnd());
+	//Restart iterator of trip.
+	trip->restartTrip();
+	isAvailableforAnotherTrip = false;
+	soc->sendData((char)Client::setTrip);
 	soc->sendData(serializeObj(trip));
 }
 
 void RemoteDriver::stopWorking()
 {
-	isDriverDriving = false;
-	currentTrip = NULL;
-	soc->sendData((char)Client::shutDown + string("shutDown"));
+	char ack;
+	isAvailableforAnotherTrip = true;
+	soc->sendData((char)Client::shutDown);
+	// waiting for the client to close
+	soc->reciveData(&ack, 1);
 }
 
-int RemoteDriver::moveOneStep(unsigned int time)
+void RemoteDriver::moveOneStep()
 {
-	// big enough to hold all numbers up to 64 bytes and '\0', Client::Actions::moveOneStep
-	char buff[4];
-	char action;
-	cout << "Here moving one step in RemoteDriver" << endl;
-	unsigned int movment;
-	// First we will check if the time is past the Trip's starting time.
-	if (currentTrip->getStartingTime() < time)
+	// if we have a job
+	if (!isAvailableforAnotherTrip)
 	{
-
-		action = (char)Client::moveOneStep;
-		soc->sendData(&action);
-		sprintf(buff, "%d", time);
-		cout << "Sending string " << buff << endl;
-		soc->sendData(buff);
-		//We are past the starting time so moveOneStep.
-		movment = myCab->getMovmentAbility();
-		cout <<"Here advancing the trip" << endl;
-		this->location = this->currentTrip->advance(movment);
-		if (location == this->currentTrip->getRoadEnd()) {
-			//Return 0 cause we ended this trip.
-			cout <<"HEREEEEEE" << endl;
-			return 0;
-		} else {
-			//We can move on from this location in the trip.
-			return 1;
-		}
+		this->location = this->currentTrip->advance(myCab->getMovmentAbility());
+		soc->sendData((char)Client::moveOneStep);
+		isAvailableforAnotherTrip = *dest == *location;
 	}
-	//There is a trip but it didn't begin,we will still move later.
-	return 1;
 }
 
 // TODO when TCP is allowed replace the movement logic and when location is
@@ -116,6 +105,4 @@ int RemoteDriver::moveOneStep(unsigned int time)
 //{
 //}
 //
-//void RemoteDriver::startDriving()
-//{
-//}
+

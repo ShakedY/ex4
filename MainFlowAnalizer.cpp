@@ -61,7 +61,7 @@ void MainFlowAnalizer::mainLoop(StringInput& info)
 	center = new TaxiCenter(map);
 	//printMenu();
 	int answer, driver_id;
-	const BFSPoint* location;
+	const Point* location;
 	do
 	{
 		//cout << "Insert another option" << endl;
@@ -119,7 +119,7 @@ void MainFlowAnalizer::printMenu()
 	cout << "7. Exit program " << endl;
 }
 
-int main(int argc, char* argv[])
+int main1(int argc, char* argv[])
 {
 	MainFlowAnalizer flow(argc, argv);
 	return 0;

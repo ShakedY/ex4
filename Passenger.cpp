@@ -18,8 +18,8 @@ double Passenger::produceTripReview() const
 	return rating;
 }
 
-void Passenger::callTaxiCenter(TaxiCenter* taxiCenter)
-{
-	taxiCenter->sendTaxi(&source, &destination);
-}
+//void Passenger::callTaxiCenter(TaxiCenter* taxiCenter)
+//{
+//	taxiCenter->sendTaxi(&source, &destination);
+//}
 

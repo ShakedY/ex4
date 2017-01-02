@@ -2,7 +2,7 @@
  * Driver.h
  *
  *  Created on: Dec 3, 2016
- *      Author: assaf
+ *      Author: Adi
  */
 
 #ifndef SRC_DRIVER_H_
@@ -11,9 +11,6 @@
 #include "BFSPoint.h"
 #include "Cab.h"
 #include "Trip.h"
-#include "Map.h"
-#include "Passenger.h"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -29,18 +26,12 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
-using namespace std;
-using namespace boost::archive;
-
-class Map;
-class Passenger;
-class Trip;
-class Cab;
 
 class Driver
 {
 private:
 	friend class boost::serialization::access;
+	friend class RemoteDriver;
 	friend class Client;
 
 	template<class Archive>
@@ -50,7 +41,7 @@ private:
 		ar & age;
 		ar & yearsOfExperience;
 		ar & numOfReivewsGotten;
-		ar & isDriverDriving;
+		ar & isAvailableforAnotherTrip;
 		ar & status;
 		ar & averageStisfaction;
 		ar & myCab;
@@ -65,33 +56,35 @@ public:
 protected:
 	int id, age, yearsOfExperience;
 	unsigned numOfReivewsGotten;
-	bool isDriverDriving;
+	bool isAvailableforAnotherTrip;
 	char status;
 	double averageStisfaction;
 	Cab* myCab;
 	Trip* currentTrip;
-	const BFSPoint *location;
+	const Point* location, *dest;
 	Map* myMap;
-	std::list<const Passenger*> passengers;
 
 public:
 	virtual ~Driver()
 	{
+		// In the case where this driver was assigned with a trip delete it cause TaxiCenter
+		// won't have this trip assigned in it's lists.
+		delete currentTrip;
 	}
 	;
-	Driver() :
-		passengers()
+	Driver()
 	{
 		id = 0;
 		age = 0;
 		yearsOfExperience = 0;
 		numOfReivewsGotten = 0;
-		isDriverDriving = false;
+		isAvailableforAnotherTrip = true;
 		status = 0;
 		averageStisfaction = 0.0;
 		myCab = NULL;
 		currentTrip = NULL;
 		location = NULL;
+		dest = NULL;
 		myMap = NULL;
 	}
 	;
@@ -99,31 +92,28 @@ public:
 			int yearsOfExperience, Map *m);
 	Driver(int id, int age, char stat, int yearsOfExperience, Cab* cab, Map *m);
 	bool hasCab() const;
-	bool isDriving() const;
-	void addPassenger(const Passenger *passenger);
-	void removePassenger(const Passenger *passenger);
+	bool isAvailable() const;
 	void addReview(double rating);
-	void setCab(Cab* cab);
-	void setTrip(Trip* trip);
+	virtual void setCab(Cab* cab);
+	virtual void setTrip(Trip* trip);
 	void setMap(Map *map);
 	void setExperience(int years);
-	void startDriving();
-	void stopWorking();
-	const BFSPoint* getLocation() const;
+	virtual void stopWorking();
+	const Point* getLocation() const;
 	const Trip* getTrip() const;
 	double getAvgSatisfaction() const;
 	int getId() const;
+	char getStatus() const;
 	int getAge() const;
 	int getExperience() const;
 	//Get the cab of the driver.
 	Cab* getCab() const;
-	//Get Trip of the driver
-	Trip* getTrip();
+	Map* getMap() const;
 	//Driver moves one step in it's Trip.
-	void moveOneStep(unsigned int time);
+	virtual void moveOneStep();
 	unsigned getDistanceFromSource()
 	{
-		return this->location->getDistance();
+		return myMap->getTheLocation(*location)->getDistance();
 	}
 
 	// friends

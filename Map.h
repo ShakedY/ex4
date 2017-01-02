@@ -9,9 +9,9 @@
 #define SRC_MAP_H_
 #include <list>
 #include "BFSPoint.h"
-#include "Trip.h"
+//#include "Trip.h"
 
-class Trip;
+//class Trip;
 #define SIZE 10
 // the grid Y axis are the opposite of the array lines indexes
 #define INDEX_TO_Y_AXIS(index, size)		(size - 1  - index)	// max_y - index
@@ -26,7 +26,8 @@ private:
 	BFSPoint grid[SIZE][SIZE];
 	std::list<BFSPoint*> obstacles;
 protected:
-	BFSPoint* getTheLocation(const BFSPoint& p);
+	BFSPoint* getLocationPrivate(const BFSPoint& p);
+	BFSPoint* getLocationPrivate(const Point& p);
 public:
 	Map() :
 			dimX(0), dimY(0)
@@ -41,9 +42,11 @@ public:
 	};
 
 	// TODO consider leaving the Trip creation logic to the map user instead of crating it here
-	Trip* calcTrip(const BFSPoint& source, const BFSPoint& destination);
+//	Trip* calcTrip(const BFSPoint& source, const BFSPoint& destination);
 	void calculateShortestPath(std::list<const BFSPoint*>& path, const BFSPoint& source,
 			const BFSPoint& destination);
+	void calculateShortestPath(std::list<Point>& path, const Point& source,
+			const Point& destination);
 	const BFSPoint* getTheLocation(unsigned x, unsigned y) const;
 	const BFSPoint* getTheLocation(const Point& p) const;
 	void giveToAllMapUsersTheirDistanceFrom(unsigned x, unsigned y);

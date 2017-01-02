@@ -68,8 +68,14 @@ public:
 	 */
 	void setNeighbors(BFSPoint * neighbor1, BFSPoint * neighbor2,
 			BFSPoint * neighbor3, BFSPoint * neighbor4);
-
-	Point getPoint();
+	/*
+	* prepare an array of pointers to BFSObject for a new BFS. This is a mandatory method, and shouldn't
+	* be use if the user want to keep previous BFS data. If all the objects BFS data variables are
+	* with their default value, this method is unnecessary.
+	*/
+	void BFSInitializationFrom2DArray(BFSPoint* nodes, unsigned int dimX,
+			unsigned int dimY, unsigned rowLen);
+	const Point& getPoint() const;
 	/*
 	* return x axis
 	*/
@@ -132,7 +138,19 @@ public:
 	 * transfering objects between the client and the server.
 	 */
 	template<class Archive>
-	void serialize(Archive & ar,const unsigned int version);
+	void serialize(Archive & ar, const unsigned int version)
+	{
+		//Call serialization from BFSObject which BFSPoint derives from.
+		ar & boost::serialization::base_object<BFSObject>(*this);
+		//Write to the archive stream members of this class.
+		ar & point;
+		ar & numOfAdjacent;
+		//Write the neighbors based on numOfAdjacent.
+		ar & adjacent1;
+		ar & adjacent2;
+		ar & adjacent3;
+		ar & adjacent4;
+	}
 };
 
 #endif /* BFSPOINT_H_ */

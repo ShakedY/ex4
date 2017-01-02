@@ -8,8 +8,8 @@
 #ifndef SRC_PASSENGER_H_
 #define SRC_PASSENGER_H_
 #include "BFSPoint.h"
-#include "TaxiCenter.h"
-class TaxiCenter;
+//#include "TaxiCenter.h"
+//class TaxiCenter;
 
 class Passenger
 {
@@ -47,7 +47,8 @@ public:
 	const BFSPoint* getSource() const;
 	const BFSPoint* getDestination() const;
 	double produceTripReview() const;
-	void callTaxiCenter(TaxiCenter* taxiCenter);
+	// TODO fix include bugs
+//	void callTaxiCenter(TaxiCenter* taxiCenter);
 };
 
 #endif /* SRC_PASSENGER_H_ */

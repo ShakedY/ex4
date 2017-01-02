@@ -215,18 +215,19 @@ Map::Map(unsigned int width, unsigned int height)
 	}
 }
 
-Trip* Map::calcTrip(const BFSPoint& source, const BFSPoint& destination)
-{
-	BFSPoint *src = getTheLocation(source), *dst = getTheLocation(destination);
-	Trip *trip = new Trip(rand(), 0, src, dst, 49.99, 0); // only 49.99! sale!!
-	return trip;
-}
+//Trip* Map::calcTrip(const BFSPoint& source, const BFSPoint& destination)
+//{
+//	BFSPoint *src = getLocationPrivate(source), *dst = getLocationPrivate(destination);
+//	Trip *trip = new Trip(rand(), 0, src, dst, 49.99, 0); // only 49.99! sale!!
+//	trip->setRoad(this);
+//	return trip;
+//}
 
 void Map::calculateShortestPath(list<const BFSPoint*>& path,
 		const BFSPoint& source, const BFSPoint& destination)
 {
-	BFSPoint *src = getTheLocation(source);
-	BFSObject *dst = (BFSObject*) getTheLocation(destination);
+	BFSPoint *src = getLocationPrivate(source);
+	BFSObject *dst = (BFSObject*) getLocationPrivate(destination);
 	if (src->getDistance() != 0)
 		src->BFS();
 	do
@@ -235,6 +236,24 @@ void Map::calculateShortestPath(list<const BFSPoint*>& path,
 		dst = dst->getParent();
 	} while (dst != src);
 	path.push_front(src);
+}
+
+void Map::calculateShortestPath(list<Point>& path,
+		const Point& source, const Point& destination)
+{
+	BFSPoint *src = getLocationPrivate(source);
+	BFSObject *dst = (BFSObject*) getTheLocation(destination);
+	if (src->getDistance() != 0)
+	{
+		grid[0][0].BFSInitializationFrom2DArray(*grid, dimX, dimY, SIZE);
+		src->BFS();
+	}
+	do
+	{
+		path.push_front(((BFSPoint*) dst)->getPoint());
+		dst = dst->getParent();
+	} while (dst != src);
+	path.push_front(src->getPoint());
 }
 
 const BFSPoint* Map::getTheLocation(unsigned x, unsigned y) const
@@ -246,7 +265,12 @@ const BFSPoint* Map::getTheLocation(unsigned x, unsigned y) const
 	return &grid[Y_AXIS_TO_INDEX(y, dimY)][x];
 }
 
-BFSPoint* Map::getTheLocation(const BFSPoint& p)
+BFSPoint* Map::getLocationPrivate(const BFSPoint& p)
+{
+	return getLocationPrivate(p.getPoint());
+}
+
+BFSPoint* Map::getLocationPrivate(const Point& p)
 {
 	unsigned int x = (unsigned) p.getX(), y = (unsigned) p.getY();
 	if (x >= dimX || y >= dimY)

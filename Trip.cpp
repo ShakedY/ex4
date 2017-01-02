@@ -1,4 +1,3 @@
-
 #include "Trip.h"
 using namespace std;
 
@@ -56,13 +55,12 @@ int Trip::getTariff() const
 	return this->tariff;
 }
 
-const BFSPoint* Trip::advence(unsigned int distance)
+const Point* Trip::advance(unsigned int distance)
 {
-	const BFSPoint* ret_val;
-	this->meters += distance;
+	const Point* ret_val;
 	try
 	{
-		// not general but its very dumb to you loop for 1 or 2
+		// not general but its very dumb to use loop for 1 or 2
 		switch(distance)
 		{
 			case 2:
@@ -73,22 +71,13 @@ const BFSPoint* Trip::advence(unsigned int distance)
 			default:
 				break;
 		}
-		ret_val = *currentPosition;
+		ret_val = &(*currentPosition);
 	} catch (exception& e)
 	{
-		ret_val = road.back();
+		// we passed the end
+		ret_val = &(road.back());
 	}
 	return ret_val;
-}
-
-bool Trip::isTripTaken() const
-{
-	return isTaken;
-}
-
-void Trip::setIsTaken()
-{
-	isTaken = true;
 }
 
 unsigned int Trip::getStartingTime()
@@ -99,23 +88,12 @@ unsigned int Trip::getStartingTime()
 void Trip::setRoad(Map* m)
 {
 	// planning the best road trip for our customers.
-	const BFSPoint* st = m->getTheLocation(startPoint), *end =
-			m->getTheLocation(endPoint);
-	m->calculateShortestPath(road, *st, *end);
+	m->calculateShortestPath(road, startPoint, endPoint);
 	currentPosition = road.begin();
+	meters = road.size();
 }
 
-const BFSPoint* Trip::getRoadStart() const
+void Trip::restartTrip()
 {
-	return road.front();
-}
-
-const BFSPoint* Trip::getRoadEnd() const
-{
-	return road.back();
-}
-
-const std::list<const BFSPoint*>& Trip::getRoad()
-{
-	return road;
+	currentPosition = road.begin();
 }

@@ -28,25 +28,24 @@ using namespace std;
 using namespace boost::archive;
 
 Driver::Driver(const BFSPoint* loc, char stat, int id, int age,
-		int yearsOfExperience, Map *m) :
-		passengers()
+		int yearsOfExperience, Map *m)
 {
 	status = stat;
 	averageStisfaction = 0.0;
 	myCab = NULL;
 	currentTrip = NULL;
-	location = loc;
+	location = &(loc->getPoint());
+	dest = NULL;
 	this->id = id;
 	myMap = m;
 	this->yearsOfExperience = yearsOfExperience;
 	this->age = age;
-	isDriverDriving = false;
+	isAvailableforAnotherTrip = true;
 	numOfReivewsGotten = 0;
 }
 
 Driver::Driver(int id, int age, char stat, int yearsOfExperience, Cab* cab,
-		Map *m) :
-		passengers()
+		Map *m)
 {
 	status = stat;
 	averageStisfaction = 0.0;
@@ -54,18 +53,18 @@ Driver::Driver(int id, int age, char stat, int yearsOfExperience, Cab* cab,
 	currentTrip = NULL;
 	if (m != NULL)
 	{
-		location = m->getTheLocation(0, 0);
+		location = &(m->getTheLocation(0, 0)->getPoint());
 	}
 	else
 	{
-
 		location = NULL;
 	}
+	dest = NULL;
 	this->id = id;
 	myMap = m;
 	this->yearsOfExperience = yearsOfExperience;
 	this->age = age;
-	isDriverDriving = false;
+	isAvailableforAnotherTrip = true;
 	numOfReivewsGotten = 0;
 }
 
@@ -74,9 +73,9 @@ bool Driver::hasCab() const
 	return myCab != NULL;
 }
 
-bool Driver::isDriving() const
+bool Driver::isAvailable() const
 {
-	return isDriverDriving;
+	return isAvailableforAnotherTrip;
 }
 
 void Driver::setCab(Cab* cab)
@@ -84,15 +83,20 @@ void Driver::setCab(Cab* cab)
 	myCab = cab;
 }
 
-const BFSPoint* Driver::getLocation() const
+const Point* Driver::getLocation() const
 {
 	return this->location;
 }
 
 void Driver::setTrip(Trip* trip)
 {
+	delete currentTrip;  // the location now is a dangling pointer
 	currentTrip = trip;
-	isDriverDriving = true;
+	location = &(currentTrip->getStart());  // fixed dangling pointer
+	dest = &(currentTrip->getEnd());
+	//Restart iterator of trip.
+	trip->restartTrip();
+	isAvailableforAnotherTrip = false;
 }
 
 const Trip* Driver::getTrip() const
@@ -100,21 +104,16 @@ const Trip* Driver::getTrip() const
 	return currentTrip;
 }
 
+char Driver::getStatus() const
+{
+	return status;
+}
+
 void Driver::setMap(Map *map)
 {
 	// new map means starting over at (0,0)
 	this->myMap = map;
-	this->location = map->getTheLocation(Point(0,0));
-}
-
-void Driver::addPassenger(const Passenger *passenger)
-{
-	this->passengers.push_back(passenger);
-}
-
-void Driver::removePassenger(const Passenger *passenger)
-{
-	this->passengers.remove(passenger);
+//	this->location = &(map->getTheLocation(Point(0, 0))->getPoint());
 }
 
 void Driver::addReview(double rating)
@@ -128,8 +127,7 @@ void Driver::addReview(double rating)
 //
 //	averageStisfaction + (rating - averageStisfaction) / (numOfReivewsGotten + 1)
 	++numOfReivewsGotten;
-	this->averageStisfaction += (rating - averageStisfaction)
-			/ numOfReivewsGotten;
+	averageStisfaction += (rating - averageStisfaction) / numOfReivewsGotten;
 }
 
 double Driver::getAvgSatisfaction() const
@@ -157,17 +155,9 @@ void Driver::setExperience(int years)
 	this->yearsOfExperience = years;
 }
 
-void Driver::startDriving()
-{
-//	const BFSPoint *loc = myMap->getTheLocation(currentTrip->getEnd());
-	isDriverDriving = true;
-//	location = loc;
-}
-
 void Driver::stopWorking()
 {
-	isDriverDriving = false;
-	currentTrip = NULL;
+	isAvailableforAnotherTrip = true;
 }
 
 Cab* Driver::getCab() const
@@ -175,19 +165,17 @@ Cab* Driver::getCab() const
 	return myCab;
 }
 
-Trip* Driver::getTrip()
+Map* Driver::getMap() const
 {
-	return currentTrip;
+	return myMap;
 }
 
-void Driver::moveOneStep(unsigned int time)
+void Driver::moveOneStep()
 {
-	unsigned int movment;
-	// First we will check if the time is past the Trip's starting time.
-	if (currentTrip->getStartingTime() >= time)
+	// if we have a job
+	if (!isAvailableforAnotherTrip)
 	{
-		//We are past the starting time so moveOneStep.
-		movment = myCab->getMovmentAbility();
-		this->location = this->currentTrip->advence(movment);
+		this->location = this->currentTrip->advance(myCab->getMovmentAbility());
+		isAvailableforAnotherTrip = dest == location;
 	}
 }

@@ -10,7 +10,6 @@
 using namespace boost::archive;
 using namespace std;
 
-
 size_t BFSObject::getDistance() const
 {
 	return distance;
@@ -25,14 +24,21 @@ void BFSObject::BFSInitialization(list<BFSObject*>& nodes)
 {
 	// the BFS initialization
 	BFSObject *node;
-	while (!nodes.empty())
+	list<BFSObject*>::iterator it = nodes.begin(), end = nodes.end();
+	for (; it != end; ++it)
 	{
-		node = nodes.front();
-		nodes.pop_front();
 		node->color = WHITE;
 		node->distance = -1;
 		node->parent = NULL;
 	}
+//	while (!nodes.empty())
+//	{
+//		node = nodes.front();
+//		nodes.pop_front();
+//		node->color = WHITE;
+//		node->distance = -1;
+//		node->parent = NULL;
+//	}
 }
 
 void BFSObject::BFS()
@@ -69,19 +75,5 @@ void BFSObject::BFS()
 			}
 		}
 	} while (!q.empty());
-}
-template<class Archive>
-void BFSObject::serialize(Archive & ar,const unsigned int version) {
-	ar & color;
-	ar & distance;
-	ar & parent;
-}
-
-
-template<class Archive>
-void BFSObject::serialize(Archive & ar,const unsigned int version) {
-	ar & color;
-	ar & distance;
-	ar & parent;
 }
 
