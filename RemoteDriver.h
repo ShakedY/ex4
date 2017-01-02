@@ -15,8 +15,7 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/export.hpp>
 
-class RemoteDriver: public Driver
-{
+class RemoteDriver: public Driver {
 private:
 	Socket *soc;
 	template<class T> string serializeObj(T* obj);
@@ -39,15 +38,15 @@ public:
 	{
 		delete soc;
 	}
-	void setCab(Cab* cab);
-	void setTrip(Trip* trip);
+	virtual void setCab(Cab* cab);
+	virtual void setTrip(Trip* trip);
 	void setMap(Map *map);
 	void setExperience(int years);
 	void startDriving();
 	void stopWorking();
 	void setSocket(Socket* sock){ soc = sock;};
 	//Driver moves one step in it's Trip.
-	void moveOneStep(unsigned int time);
+	virtual int moveOneStep(unsigned int time);
 };
 
 #endif /* REMOTEDRIVER_H_ */
