@@ -17,7 +17,7 @@ public:
 	* The output: none										               *
 	* The Function operation: creating new Udp						       *
 	***********************************************************************/
-	Udp(bool isServers, int port_num);
+	Udp(bool isServers, int port_num,string ip = IP);
 	/***********************************************************************
 	* function name: ~Udp												   *
 	* The Input: none													   *
@@ -41,6 +41,14 @@ public:
 	* who connect to this socket.										   *
 	***********************************************************************/
 	int sendData(string data);
+	/***********************************************************************
+	* function name: sendData											   *
+	* The Input: a char representing the data to send		               *
+	* The output: int number representing the return status		           *
+	* The Function operation: sending the input data to the socket         *
+	* who connect to this socket.										   *
+	***********************************************************************/
+	int sendData(char data);
 	/***********************************************************************
 	* function name: recive	`											   *
 	* The Input: none										               *

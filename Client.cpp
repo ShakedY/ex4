@@ -21,18 +21,22 @@ using namespace boost::archive;
 
 Client::Client(int argc, char* argv[])
 {
-	// Choose socket to run on port 110000, enter false
+	// Create a socket to run on the entered id adress and port.
 	// because it's not a server, no need to bind.
-	mySocket = new Udp(0, 8000);
+ 	mySocket = new Udp(0, atoi(argv[2]),argv[1]);
+ 	//Set all pointers to be NULL at first.
 	driver = NULL;
 	cab = NULL;
 	trip = NULL;
+	//Initialize the socket.
 	mySocket->initialize();
+	//Start creating the driver and communication process.
 	buildDriver();
 }
 
 Client::~Client()
 {
+	//Delete driver and cab.The driver will delete the trip by itself.
 	delete driver;
 	delete cab;
 	//Call socket's destructor to close it.
@@ -41,25 +45,31 @@ Client::~Client()
 
 void Client::run()
 {
+	//Run a switch on the action that we will get from the server.
 	char action = -1;
 	do
 	{
+		//Receive an action from the server which is one byte.
 		mySocket->reciveData(&action, 1);
 		switch (action)
 		{
 			case moveOneStep:
+				//Server moved the driver one step so our driver will move as well.
 				driver->moveOneStep();
 				break;
 			case setTrip:
+				//Server tells us it will send us a new trip,run getTripFromServer function.
 				getTripFromServer();
 				break;
 			case shutDown:
+				//Server told us to shutDown so break from this switch.
 				break;
 			default:
 				// no such operator
 				break;
 		}
 	} while (action != shutDown);
+	//ACK tell server we got everything.
 	mySocket->sendData('a');
 }
 
@@ -101,96 +111,11 @@ void Client::getTripFromServer()
 	driver->setTrip(trip);
 }
 
-void Client::printMenu()
-{
-	cout << "Insert driver (id,age,status,experience,vehicle_id) " << endl;
-}
-
-//void Client::moveInTrip()
-//{
-//	const Point* end = &(trip->getEnd());
-//	char action;
-//	mySocket->reciveData(&action, 1);
-//	while (action == (char) moveOneStep || end != driver->location)
-//	{
-//		driver->moveOneStep();
-//		// TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
-//		mySocket->reciveData(&action, 1);
-//	}
-////	do
-////	{
-////		// TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
-////		mySocket->reciveData(&action, 1);
-////		cout << "Received data" << endl;
-////		if (action == (char) moveOneStep)
-////		{
-////			driver->moveOneStep();
-////		}
-////	} while (action != (char) shutDown && end != driver->location);
-//}
-
-void Client::waitForTrip()
-{
-	//Delete the trip we ended and set it to null afterwards.
-	//First let the server know we ended the trip.
-	char action = endedTrip, endingAction;
-	//Let server know trip is done.
-	mySocket->sendData(&action);
-	//Delete our trip and set it to NULL afterwards.
-	delete trip;
-	trip = NULL;
-	//Server will tell us to shut down or set new trip.
-	mySocket->reciveData(&endingAction, 1);
-	if (action == (char) shutDown)
-	{
-		//Case of a shutdown return.
-		return;
-	}
-	else
-	{
-		//Other case,wait for a new server.
-		getTripFromServer();
-	}
-
-}
-/*void Client::work()
- {
- const BFSPoint *end = trip->getRoadEnd();
- char action, buff[BUFFSIZE];
- unsigned int time;
- do
- {
- // TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
- mySocket->reciveData(&action, 1);
- cout <<"Received data" << endl;
- if (action == (char)moveOneStep)
- {
- cout <<"Moving one step from client's message" << endl;
- mySocket->reciveData(buff, 4);
- cout << "Received time" << endl;
- time = atoi(buff);
- cout <<"Current time" << time << endl;
- driver->moveOneStep(time);
- cout << "MOVED" << endl;
- }
- } while(action != (char)shutDown && end != driver->location);
- // TODO replace this ugly shit. It's here to prevent the server from
- // sending to a socket
- if (action != (char)shutDown)
- {
- do
- {
- // TODO check possible problems of reading 1 byte(it might write 2 because of the \0)
- action =
- mySocket->reciveData(&action, 1);
- } while(action != (char)shutDown);
- }
- //Get here when shutdown was sent.
- }*/
 
 template<class T>
 void Client::serializeObj(std::string* serial_str, T* obj)
 {
+	//Serialize the object using recitation examples.
 	boost::iostreams::back_insert_device<std::string> inserter(*serial_str);
 	boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(
 			inserter);
@@ -203,6 +128,7 @@ template<class T>
 T* Client::deSerializeObj(const char* serial_str, int size)
 {
 	T* obj;
+	//Deserialize same as recitation examples.
 	boost::iostreams::basic_array_source<char> device(serial_str, size);
 	boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s(
 			device);
@@ -213,7 +139,9 @@ T* Client::deSerializeObj(const char* serial_str, int size)
 
 int main(int argc, char* argv[])
 {
+	//Create a driver.
 	Client driver(argc, argv);
+	//Get commands from server in run function
 	driver.run();
 	return 0;
 }

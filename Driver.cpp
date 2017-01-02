@@ -90,12 +90,16 @@ const Point* Driver::getLocation() const
 
 void Driver::setTrip(Trip* trip)
 {
-	delete currentTrip;  // the location now is a dangling pointer
+	//Delete trip we already had.
+	delete currentTrip;
+	//Set our trip to be the entered trip.
 	currentTrip = trip;
-	location = &(currentTrip->getStart());  // fixed dangling pointer
+	//Set location to beginning of trip and destination to the end of it.
+	location = &(currentTrip->getStart());
 	dest = &(currentTrip->getEnd());
 	//Restart iterator of trip.
 	trip->restartTrip();
+	//Set this driver to be unavailable for another trip.
 	isAvailableforAnotherTrip = false;
 }
 
@@ -113,7 +117,6 @@ void Driver::setMap(Map *map)
 {
 	// new map means starting over at (0,0)
 	this->myMap = map;
-//	this->location = &(map->getTheLocation(Point(0, 0))->getPoint());
 }
 
 void Driver::addReview(double rating)

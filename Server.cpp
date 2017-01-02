@@ -5,8 +5,8 @@
 Server::Server(int argc, char* argv[]) :
 		factory()
 {
-	//Create Udp socket.
-	socket = new Udp(1, 8000);
+	//Create Udp socket.Port will be in command line arguments.
+	socket = new Udp(1, atoi(argv[1]));
 	socket->initialize();
 	StringInput input(argc, argv);
 	input.readMapInfo();
@@ -22,12 +22,14 @@ Server::~Server()
 
 Cab* Server::createCab(StringInput::CabInfo cabsInfo)
 {
+	//Create a cab with the CabFactory object.
 	return factory.generateCab(cabsInfo.id, cabsInfo.taxi_type, cabsInfo.color,
 			cabsInfo.manufacturer);
 }
 
 Trip* Server::createTrip(StringInput::TripInfo tripInfo)
 {
+	//Create a new trip based on the TripInfo.
 	Point start(tripInfo.x_start, tripInfo.y_start), end(tripInfo.x_end,
 			tripInfo.y_end);
 	return new Trip(tripInfo.id, tripInfo.num_passengers, start, end,
@@ -36,14 +38,15 @@ Trip* Server::createTrip(StringInput::TripInfo tripInfo)
 
 void Server::createMap(StringInput& info)
 {
+	//Create a new map based on the info entered in StringInfo.
 	map = new Map(info.gridInfo.width, info.gridInfo.height,
 			*(info.gridInfo.obstacles));
 }
 
 void Server::mainLoop(StringInput& info)
 {
+	//Create our TaxiCenter.
 	center = new TaxiCenter(map);
-	//printMenu();
 	int answer, driver_id;
 	const Point* location;
 	Trip *tmp;
@@ -76,10 +79,9 @@ void Server::mainLoop(StringInput& info)
 
 				if (location != NULL)
 					cout << *location << endl;
-				else
-					cout << "No driver with this id" << endl;
 				break;
 			case 9:
+				//Tell the TaxiCenter to move all the drivers by one step.
 				center->moveAllOneStep();
 				break;
 			default:
@@ -87,6 +89,7 @@ void Server::mainLoop(StringInput& info)
 				break;
 		}
 	} while (answer != 7);
+	//Send shutdown to all the clients.
 	center->endWorking();
 }
 
@@ -96,8 +99,6 @@ void Server::getNumDrivers()
 	char buffer[BUFFSIZE];
 	RemoteDriver* currentDriver;
 	Driver *drv;
-	//Set boolean to be true to know we already connected to the client.
-	/* we use list, it doesn't effects us. */
 	//Scan the number of drivers from the console.
 	scanf("%d", &numDrivers);
 	//Now we expect to get the drivers through the socket and send them cabs.
@@ -106,8 +107,11 @@ void Server::getNumDrivers()
 		// Deserialize the data.
 		size = socket->reciveData(buffer, BUFFSIZE);
 		drv = deSerializeObj<Driver>(buffer, size);
+		//Create the new remote driver.
 		currentDriver = new RemoteDriver(drv, socket);
+		//Remote driver saved all of the driver's data so delete the driver.
 		delete drv;
+		//Add the RemoteDriver to the TaxiCenter.
 		center->addDriver(currentDriver);
 	}
 	// Add to the driver the fitting cab from the TaxiCenter.
@@ -119,6 +123,7 @@ void Server::getNumDrivers()
 template<class T>
 void Server::serializeObj(std::string* serial_str, T* obj)
 {
+	//Serialize an object same as recitations examples.
 	boost::iostreams::back_insert_device<std::string> inserter(*serial_str);
 	boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(
 			inserter);
@@ -130,7 +135,7 @@ void Server::serializeObj(std::string* serial_str, T* obj)
 template<class T>
 T* Server::deSerializeObj(const char* serial_str, int size)
 {
-
+	//Deserialize an object same as recitations examples.
 	T* obj;
 	boost::iostreams::basic_array_source<char> device(serial_str, size);
 	boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s(

@@ -31,14 +31,6 @@ void BFSObject::BFSInitialization(list<BFSObject*>& nodes)
 		node->distance = -1;
 		node->parent = NULL;
 	}
-//	while (!nodes.empty())
-//	{
-//		node = nodes.front();
-//		nodes.pop_front();
-//		node->color = WHITE;
-//		node->distance = -1;
-//		node->parent = NULL;
-//	}
 }
 
 void BFSObject::BFS()

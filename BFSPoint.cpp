@@ -121,6 +121,7 @@ void BFSPoint::adjacent(list<BFSObject*>& lst)
 
 BFSPoint& BFSPoint::operator=(const BFSPoint& other)
 {
+	//Use = operator for the point and adjacents.
 	this->point = other.point;
 	this->numOfAdjacent = other.numOfAdjacent;
 	this->adjacent1 = other.adjacent1;

@@ -16,10 +16,12 @@ Cab* CabFactory::generateCab(int id, Cab::CabType cabType, Cab::cabColor color, 
 	//Use the cabType enum to identify which cab to create.
 	if (cabType == Cab::LUXURY)
 	{
+		//Create luxury cab.
 		newCab = new LuxuryCab(id, color, man);
 	}
 	else if (cabType == Cab::STANDARD)
 	{
+		//Create a standard cab.
 		newCab = new StandardCab(id, color, man);
 
 	}

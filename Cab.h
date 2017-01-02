@@ -23,10 +23,14 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
-
+/*
+ * This is the cab class,it will have all the basic implementations we will
+ * require from a general cab,this class will be abstract cause there will be some
+ * classes which will derive from this class that we will really use.
+ */
 class Cab
 {
-// first public is just for enum defining
+// First public is just for enum defining
 public:
 	enum cabColor
 	{
@@ -42,8 +46,13 @@ public:
 	};
 
 private:
+	//For using boost's serialization.
 	friend class boost::serialization::access;
 
+	/*
+	 * This method will be used during the serialization of this class
+	 * with the boost library.
+	 */
 	template<class Archive>
 	void serialize(Archive & ar, const unsigned int version)
 	{
@@ -54,18 +63,24 @@ private:
 		ar & manufacturer;
 	}
 protected:
-	// tariff(Hebrew)
 	int id, numOfKilometers, tariff;
 	unsigned int movmentAbility;
 	char color;
 	char manufacturer;
 public:
+	/*
+	 * Default constructor of this class,use delegations to create default values for
+	 * private members of this class.
+	 */
 	Cab() :
 			id(0), numOfKilometers(0), tariff(0), movmentAbility(0), color(
 					BLUE), manufacturer(HONDA)
 	{
 	}
 	;
+	/*
+	 * Constructor of this class that will get the cab's id,tariff,color and manufacturer.
+	 */
 	Cab(int idCab, int tariffCab, char color, char manufacturerCab) :
 			id(idCab), tariff(tariffCab), color(color), manufacturer(
 					manufacturerCab)
@@ -74,16 +89,26 @@ public:
 		movmentAbility = 0;
 	}
 	;
+	//Default destructor of this class.
 	virtual ~Cab()
 	{
 	}
 	;
-
+	//Get id of this cab.
 	int getCabId() const;
+	//Get movement ability of this cab,will depend on the cabType.
 	unsigned int getMovmentAbility();
+	//Get manufacturer of this cab.
 	char getManufacturer() const;
+	//Get the kilometers this cab has passed.
 	int getKilometerage() const;
+	//Get the color of this cab.
 	char getColor() const;
+	/*
+	 * Get the type of this cab:Luxury or Standard,this will be a pure virtual method cause
+	 * only the classes that will be derived from this class will care about the type of the
+	 * cab.
+	 */
 	virtual CabType getCabType() = 0;
 };
 

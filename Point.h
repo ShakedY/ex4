@@ -25,18 +25,24 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
+/*
+ * This is the Point class,in our case the world is a 2 dimensional space so a
+ * Point will represent a location in our world with two indexes.
+ */
 class Point
 {
 private:
 	int x, y;
+
 	/*
-	 * returns the number of digits in an int
+	 * Returns the number of digits in an int
 	 */
 	inline unsigned numOfDigits(int n) const;
+	//Use for boost's serialization.
 	friend class boost::serialization::access;
 public:
 	/*
-	 * constructor method
+	 * Constructor method
 	 * initialize point object
 	 * @param integer of x axis, integer of y axis
 	 */

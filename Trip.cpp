@@ -9,12 +9,14 @@ void Trip::addPassenger(const Passenger *passenger)
 
 void Trip::addPassengers(list<const Passenger*> passengers)
 {
+	//Add a list of passengers to the current passengers.
 	numOfPassengers += passengers.size();
 	this->passengers.merge(passengers);
 }
 
 double Trip::getPassengersSatisfaction() const
 {
+	//Calculate randomly in a loop the satisfaction of the passengers.
 	list<const Passenger*>::const_iterator it = passengers.begin(), end =
 			passengers.end();
 	double satis = 0.0;
@@ -58,25 +60,31 @@ int Trip::getTariff() const
 const Point* Trip::advance(unsigned int distance)
 {
 	const Point* ret_val;
-	try
+	// not general but its very dumb to use loop for 1 or 2
+	switch(distance)
 	{
-		// not general but its very dumb to use loop for 1 or 2
-		switch(distance)
-		{
-			case 2:
+		case 2: {
+			//Check first if we are one step away from end point.
+			std::list<Point>::iterator it = currentPosition;
+			if ((*(++it)) == endPoint) {
+				//We are one step away from end point so move only one.
 				++currentPosition;
+			} else {
+				//We have two or more steps to take till the end point.
+				++currentPosition;
+				++currentPosition;
+				}
+				break;
+			}
 			case 1:
+				//Case of standard cab,move only one point.
 				++currentPosition;
 				break;
 			default:
 				break;
 		}
-		ret_val = &(*currentPosition);
-	} catch (exception& e)
-	{
-		// we passed the end
-		ret_val = &(road.back());
-	}
+	//Set return value to be current position in the trip.
+	ret_val = &(*currentPosition);
 	return ret_val;
 }
 
@@ -87,9 +95,10 @@ unsigned int Trip::getStartingTime()
 
 void Trip::setRoad(Map* m)
 {
-	// planning the best road trip for our customers.
+	// planning the best road trip for our customers.Calculate the shortest path.
 	m->calculateShortestPath(road, startPoint, endPoint);
 	currentPosition = road.begin();
+	//Set the length of the trip in meters to size of the road.
 	meters = road.size();
 }
 

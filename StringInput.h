@@ -14,10 +14,11 @@
 #include "Driver.h"
 #include <string>
 
+/*
+ * The StringInput class will hold several structs which define specific information the
+ * user will enter to the console about several objects(trip,driver,cab etc)/
+ */
 class StringInput {
-//private:
-//	int getNumber(std::string info);
-//	double getDoubleNumber(std::string info);
 public:
 	//Create structs that will define the info we will get from the user about each object.
 	typedef struct mapInfo
@@ -43,18 +44,30 @@ public:
 		Cab::Manufacturer manufacturer;
 		Cab::cabColor color;
 	} CabInfo;
+	//Use these structs as public members of this class(Server will have access to them).
 	mapInfo gridInfo;
 	DriverInfo driverInfo;
 	CabInfo cabInfo;
 	TripInfo tripInfo;
 	int argc;
 	char** argv;
+
+	//Constructor of this class which will get the command line arguments.
 	StringInput(int argc, char* argv[]);
+
+	//Default destructor.
 	virtual ~StringInput();
 
+	//Get info about the map from the console.
 	void readMapInfo();
+
+	//Get info about the driver from the console.
 	void getDriverInfo();
+
+	//Get info about a cab from the console.
 	void getCabInfo();
+
+	//Get info about the Trip from the console.
 	void getTripInfo();
 };
 

@@ -31,6 +31,7 @@ string Point::toString() const
 
 inline unsigned Point::numOfDigits(int n) const
 {
+	//Count the number of digits in a loop.
 	unsigned digits = 0;
 	do
 	{
@@ -42,6 +43,7 @@ inline unsigned Point::numOfDigits(int n) const
 
 Point& Point::operator =(const Point& other)
 {
+	//Use operator = for x and y indexes.
 	x = other.x;
 	y = other.y;
 	return *this;

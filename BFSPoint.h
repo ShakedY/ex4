@@ -29,7 +29,12 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/export.hpp>
 
-
+/*
+ * This is our BFSPoint class,it will be derived from the BFSObject that
+ * we defined,each BFSPoint will hold the matching Point and all the
+ * adjacent BFSPoint's it has on the map,it will use the bfs algorithm to
+ * calculate paths through the map.
+ */
 class BFSPoint : public BFSObject
 {
 private:

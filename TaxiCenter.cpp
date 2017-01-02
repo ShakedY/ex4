@@ -45,8 +45,14 @@ void TaxiCenter::addCab(Cab* cab)
 
 void TaxiCenter::addTrip(Trip* trip)
 {
+	//Set the road of this trip.
 	trip->setRoad(map);
-	trips.push_back(trip);
+	//Make sure trips are sorted by starting time.
+	std::list<Trip*>::iterator it = trips.begin();
+	while (it != trips.end() && trip->getStartingTime() > (*it)->getStartingTime()) {
+		++it;
+	}
+	trips.insert(it,trip);
 }
 
 void TaxiCenter::addDrivers(list<Driver*> drivs)
@@ -140,11 +146,6 @@ void TaxiCenter::attachMaptoDrivers(Map* map)
 	}
 }
 
-//bool TaxiCenter::checkingIfDriving(Driver* driver)
-//{
-//	return true;
-//}
-
 std::list<Driver*> TaxiCenter::getDriversList() const
 {
 	return drivers;
@@ -172,6 +173,7 @@ Cab* TaxiCenter::getCab(int cabId) const
 
 void TaxiCenter::attachCabsToDrivers()
 {
+	//Iterate through cabs and drivers and give cabs to drivers with no cab.
 	for (std::list<Cab*>::iterator itCabs = cabs.begin(); itCabs != cabs.end();
 			++itCabs)
 	{
@@ -217,6 +219,7 @@ void TaxiCenter::attachDriversToTrips()
 
 void TaxiCenter::endWorking()
 {
+	//Iterate through all the drivers and tell them to stop working.
 	for (std::list<Driver*>::iterator itDrivers = drivers.begin();
 			itDrivers != drivers.end(); ++itDrivers)
 	{
@@ -226,14 +229,6 @@ void TaxiCenter::endWorking()
 		}
 	}
 }
-
-//void TaxiCenter::setNumDrivers(int num) {
-//	//Set fixed list size with num.
-//	const size_t listSize(num);
-//	list<Driver*> driversList(listSize);
-//	//Set our drivers list to be of this specific size.
-//	drivers = driversList;
-//}
 
 int TaxiCenter::getCurrentTime()
 {
@@ -246,38 +241,11 @@ void TaxiCenter::moveAllOneStep()
 	for (; it != end; ++it)
 	{
 		(*it)->moveOneStep();
-//		if (!(*it)->moveOneStep(time))
-//		{
-//			cout << "End of first trip" << endl;
-//			//If moveOneStep returned 0 we are at the end.
-//			//Check if there is an available trip in our location.
-//			if (tripAtLocation((*it)->getLocation()) != NULL)
-//			{
-//				cout << "Found new trip" << endl;
-//				//Set a new trip for this driver.
-//				(*it)->setTrip(tripAtLocation((*it)->getLocation()));
-//			}
-//		}
 	}
 	++time;
 	// In this case the after assigning the trips.
 	attachDriversToTrips();
 }
-
-//Trip* TaxiCenter::tripAtLocation(const BFSPoint* location)
-//{
-//	list<Trip*>::iterator it = trips.begin(), end = trips.end();
-//	for (; it != end; ++it)
-//	{
-//		if ((*it)->getStart() == location)
-//		{
-//			//Set trip with start location of the input location
-//			return (*it);
-//		}
-//	}
-//	//No trip beggining in this location,return NULL.
-//	return NULL;
-//}
 
 list<const Driver*>* TaxiCenter::getDrivers() const
 {
@@ -289,14 +257,3 @@ list<const Driver*>* TaxiCenter::getDrivers() const
 	}
 	return lst;
 }
-
-/*list<const Trip*>* TaxiCenter::getTrips() const
- {
- //Iterate over all of the trips in the taxicenter and return a list of them.
- list<Trip*>::const_iterator it = trips.begin(), end = trips.end();
- list<const Trip*>* lst = new list<const Trip*>();
- for (;it != end;++it) {
- lst->push_back(*it);
- }
- return lst;
- }*/

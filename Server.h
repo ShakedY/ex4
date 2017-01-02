@@ -27,6 +27,11 @@
 //Forward declaration of StringInput
 class StringInput;
 
+/*
+ * The Server class will communicate with the user through the console,it will
+ * hold the TaxiCenter which will manage all the connections between drivers,cabs
+ * and trips and communicate with the clients as well.
+ */
 class Server {
 private:
 	CabFactory factory;

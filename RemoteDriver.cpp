@@ -28,6 +28,7 @@ RemoteDriver::RemoteDriver(Driver *drv, Socket *socket) :
 
 template<class T> string RemoteDriver::serializeObj(T* obj)
 {
+	//Serialize an object same as recitations examples.
 	std::string serial_str;
 	boost::iostreams::back_insert_device<std::string> inserter(serial_str);
 	boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(
@@ -41,6 +42,7 @@ template<class T> string RemoteDriver::serializeObj(T* obj)
 template<class T>
 T* RemoteDriver::deSerializeObj(const char* serial_str, int size)
 {
+	//Deserialize an object same as recitations examples.
 	T* obj;
 	boost::iostreams::basic_array_source<char> device(serial_str, size);
 	boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s(
@@ -74,7 +76,7 @@ void RemoteDriver::stopWorking()
 	char ack;
 	isAvailableforAnotherTrip = true;
 	soc->sendData((char)Client::shutDown);
-	// waiting for the client to close
+	// waiting ack from the client to close
 	soc->reciveData(&ack, 1);
 }
 
