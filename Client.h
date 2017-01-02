@@ -23,13 +23,17 @@ public:
 	typedef enum {
 		moveOneStep = 0,
 		setTrip = 1,
-		shutDown = 2
+		endedTrip = 2,
+		shutDown = 3
 	} Actions;
 	Client(int argc, char* argv[]);
 	virtual ~Client();
 	void buildDriver();
 	void printMenu();
 	void work();
+	void getTripFromServer();
+	void moveInTrip();
+	void waitForTrip();
 
 	template<class T>
 	void serializeObj(std::string* serial_str, T* obj);
