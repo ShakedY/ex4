@@ -62,7 +62,7 @@ void RemoteDriver::setTrip(Trip* trip)
 {
 	delete currentTrip;
 	currentTrip = trip;
-	location = &(currentTrip->getStart());
+	location = (currentTrip->getStart());
 	dest = &(currentTrip->getEnd());
 	//Restart iterator of trip.
 	trip->restartTrip();
@@ -85,9 +85,9 @@ void RemoteDriver::moveOneStep()
 	// if we have a job
 	if (!isAvailableforAnotherTrip)
 	{
-		this->location = this->currentTrip->advance(myCab->getMovmentAbility());
+		this->location = *(this->currentTrip->advance(myCab->getMovmentAbility()));
 		soc->sendData((char)Client::moveOneStep);
-		isAvailableforAnotherTrip = *dest == *location;
+		isAvailableforAnotherTrip = *dest == location;
 	}
 }
 

@@ -34,7 +34,7 @@ Driver::Driver(const BFSPoint* loc, char stat, int id, int age,
 	averageStisfaction = 0.0;
 	myCab = NULL;
 	currentTrip = NULL;
-	location = &(loc->getPoint());
+	location = (loc->getPoint());
 	dest = NULL;
 	this->id = id;
 	myMap = m;
@@ -53,11 +53,11 @@ Driver::Driver(int id, int age, char stat, int yearsOfExperience, Cab* cab,
 	currentTrip = NULL;
 	if (m != NULL)
 	{
-		location = &(m->getTheLocation(0, 0)->getPoint());
+		location = (m->getTheLocation(0, 0)->getPoint());
 	}
 	else
 	{
-		location = NULL;
+		location = Point(0,0);
 	}
 	dest = NULL;
 	this->id = id;
@@ -85,7 +85,7 @@ void Driver::setCab(Cab* cab)
 
 const Point* Driver::getLocation() const
 {
-	return this->location;
+	return &(this->location);
 }
 
 void Driver::setTrip(Trip* trip)
@@ -95,7 +95,7 @@ void Driver::setTrip(Trip* trip)
 	//Set our trip to be the entered trip.
 	currentTrip = trip;
 	//Set location to beginning of trip and destination to the end of it.
-	location = &(currentTrip->getStart());
+	location = (currentTrip->getStart());
 	dest = &(currentTrip->getEnd());
 	//Restart iterator of trip.
 	trip->restartTrip();
@@ -178,7 +178,7 @@ void Driver::moveOneStep()
 	// if we have a job
 	if (!isAvailableforAnotherTrip)
 	{
-		this->location = this->currentTrip->advance(myCab->getMovmentAbility());
-		isAvailableforAnotherTrip = dest == location;
+		this->location = *(this->currentTrip->advance(myCab->getMovmentAbility()));
+		isAvailableforAnotherTrip = *dest == location;
 	}
 }

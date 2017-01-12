@@ -75,7 +75,8 @@ protected:
 	//Trip of this driver.
 	Trip* currentTrip;
 	//Driver's location and ending destination of trip.
-	const Point* location, *dest;
+	Point location;
+	const Point *dest;
 	//The map of the world.
 	Map* myMap;
 
@@ -100,7 +101,7 @@ public:
 		averageStisfaction = 0.0;
 		myCab = NULL;
 		currentTrip = NULL;
-		location = NULL;
+		location = Point(0,0);
 		dest = NULL;
 		myMap = NULL;
 	}
@@ -182,7 +183,7 @@ public:
 	//Get the distance from the source.
 	unsigned getDistanceFromSource()
 	{
-		return myMap->getTheLocation(*location)->getDistance();
+		return myMap->getTheLocation(location)->getDistance();
 	}
 
 	// Operator overloading for << operator of output stream.
