@@ -39,21 +39,24 @@ private:
 	Map* map;
 	//Current time of the world.
 	unsigned int time;
-public:
+	static TaxiCenter* instance;
 	/*
-	 * Constructor of the TaxiCenter,it will get the map of the world as it's input
-	 * and create an empty list of cabs,drivers and trips that will be filled when the user
-	 * will enter one of the trips cabs or drivers,it will also set the time to be 0 to start
-	 * the program.
-	 */
-	TaxiCenter(Map *m) :
-			drivers(), cabs(), trips(), map(m), time(0)
-	{
-		std::list<Cab*> cabs;
-		std::list<Driver*> drivers;
-		std::list<Trip*> trips;
-	}
-	;
+		 * Constructor of the TaxiCenter,it will get the map of the world as it's input
+		 * and create an empty list of cabs,drivers and trips that will be filled when the user
+		 * will enter one of the trips cabs or drivers,it will also set the time to be 0 to start
+		 * the program.We made the constructor private because we will use it while implementing
+		 * the threads so we will get the TaxiCenter via static method.
+		 */
+		TaxiCenter(Map *m) :
+				drivers(), cabs(), trips(), map(m), time(0)
+		{
+			std::list<Cab*> cabs;
+			std::list<Driver*> drivers;
+			std::list<Trip*> trips;
+		}
+		;
+public:
+	static TaxiCenter* getInstance(Map *m = NULL);
 	/*
 	 * Destructor of the TaxiCenter,it will delete all of the drivers,cabs and trips
 	 * that were assigned to the program from the user.

@@ -2,6 +2,16 @@
 #include <list>
 #include "RemoteDriver.h"
 using namespace std;
+TaxiCenter* TaxiCenter::instance  = NULL;
+
+
+TaxiCenter* TaxiCenter::getInstance(Map* m) {
+	if(!instance) {
+		//Case where instance is NULL and it wasn't created yet.
+		instance = new TaxiCenter(m);
+	}
+	return instance;
+}
 
 TaxiCenter::~TaxiCenter()
 {

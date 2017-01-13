@@ -24,6 +24,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <pthread.h>
 //Forward declaration of StringInput
 class StringInput;
 
@@ -40,6 +41,10 @@ private:
 	TaxiCenter* center;
 	Map* map;
 public:
+	struct Param{
+		Socket* serverSocket;
+		pthread_mutex_t locker;
+	};
 	Server();
 	Server(int argc,char* argv[]);
 	virtual ~Server();
@@ -89,9 +94,18 @@ public:
 	 * to serialize and deserialize plenty of objects cause the code
 	 * is the same for all of them.
 	 */
-	void serializeObj(std::string* serial_str, T* obj);
+	static void serializeObj(std::string* serial_str, T* obj);
 	template<class T>
-	T* deSerializeObj(const char* serial_str, int size);
+	static T* deSerializeObj(const char* serial_str, int size);
+	/*
+	 * Static method which we will run in seperate threads to create
+	 * connections with multiple clients at once because accept method of
+	 * Tcp is code blocking.It will get a mutex lock which we
+	 * will use as a parameter and when it will connect with the client it will
+	 *  create the RemoteDriver and add it carefully to the TaxiCenter via the Server
+	 *  by using the lock.
+	 */
+	static void* manageClient(void* param);
 };
 
 #endif /* SERVER_H_ */
