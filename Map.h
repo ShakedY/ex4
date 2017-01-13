@@ -12,7 +12,7 @@
 //#include "Trip.h"
 
 //class Trip;
-#define SIZE 10
+#define SIZE 2000
 // the grid Y axis are the opposite of the array lines indexes
 #define INDEX_TO_Y_AXIS(index, size)		(size - 1  - index)	// max_y - index
 #define Y_AXIS_TO_INDEX(y, size)		(size - 1  - y)		// max_index - y

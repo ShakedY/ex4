@@ -6,7 +6,7 @@ Server::Server(int argc, char* argv[]) :
 		factory()
 {
 	//Create Udp socket.Port will be in command line arguments.
-	socket = new Udp(1, atoi(argv[1]));
+	socket = new Tcp(1, atoi(argv[1]));
 	socket->initialize();
 	StringInput input(argc, argv);
 	input.readMapInfo();
@@ -95,6 +95,7 @@ void Server::getNumDrivers()
 {
 	int numDrivers, size;
 	char buffer[BUFFSIZE];
+	Tcp* clientSocket;
 	RemoteDriver* currentDriver;
 	Driver *drv;
 	//Scan the number of drivers from the console.
@@ -103,10 +104,12 @@ void Server::getNumDrivers()
 	while (numDrivers-- != 0)
 	{
 		// Deserialize the data.
-		size = socket->reciveData(buffer, BUFFSIZE);
+		//Get descriptor of client.
+		clientSocket = ((Tcp*)socket)->acceptClient();
+		size = clientSocket->reciveData(buffer, BUFFSIZE);
 		drv = deSerializeObj<Driver>(buffer, size);
 		//Create the new remote driver.
-		currentDriver = new RemoteDriver(drv, socket);
+		currentDriver = new RemoteDriver(drv, clientSocket);
 		//Remote driver saved all of the driver's data so delete the driver.
 		delete drv;
 		//Add the RemoteDriver to the TaxiCenter.
