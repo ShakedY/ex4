@@ -1,6 +1,7 @@
 #include "Server.h"
 #include <stdlib.h>
 #define BUFFSIZE 1024
+volatile int running_threads = 0;
 
 Server::Server(int argc, char* argv[]) :
 		factory()
@@ -46,7 +47,7 @@ void Server::createMap(StringInput& info)
 void Server::mainLoop(StringInput& info)
 {
 	//Create our TaxiCenter.
-	center = new TaxiCenter(map);
+	center = TaxiCenter::getInstance(map);
 	int answer, driver_id;
 	const Point* location;
 	Trip *tmp;
@@ -98,27 +99,64 @@ void Server::getNumDrivers()
 	Tcp* clientSocket;
 	RemoteDriver* currentDriver;
 	Driver *drv;
+	pthread_t currentThread;
+	int thread;
+	pthread_mutex_t currentLock;
+	Param* currentStruct;
 	//Scan the number of drivers from the console.
 	scanf("%d", &numDrivers);
+	running_threads = numDrivers;
 	//Now we expect to get the drivers through the socket and send them cabs.
 	while (numDrivers-- != 0)
 	{
+
 		// Deserialize the data.
-		//Get descriptor of client.
-		clientSocket = ((Tcp*)socket)->acceptClient();
-		size = clientSocket->reciveData(buffer, BUFFSIZE);
-		drv = deSerializeObj<Driver>(buffer, size);
-		//Create the new remote driver.
-		currentDriver = new RemoteDriver(drv, clientSocket);
-		//Remote driver saved all of the driver's data so delete the driver.
-		delete drv;
-		//Add the RemoteDriver to the TaxiCenter.
-		center->addDriver(currentDriver);
+		//Move accept of client to a thread so we will be able to get clients at once.
+		currentStruct = new Param;
+		currentStruct->serverSocket = socket;
+		//Set up the mutex lock.
+		pthread_mutex_init(&(currentStruct->locker),0);
+		//Create thread for running the code blocking accept.
+		thread = pthread_create(&currentThread,NULL,Server::manageClient
+							,currentStruct);
 	}
-	// Add to the driver the fitting cab from the TaxiCenter.
+	//Wait for all the threads to end by sleeping.
+	while (running_threads > 0) {
+		sleep(1);
+	}
 	center->attachCabsToDrivers();
 	// sending the clients trips
 	center->attachDriversToTrips();
+}
+
+void* Server::manageClient(void * params) {
+	Param* parameters = (Param*) params;
+	Socket* mySocket = parameters->serverSocket;
+	pthread_mutex_t lock = parameters->locker;
+	Tcp* clientSocket;
+	Driver* drv;
+	TaxiCenter* myCenter = TaxiCenter::getInstance();
+	int size;
+	char buffer[BUFFSIZE];
+	RemoteDriver* currentDriver;
+	//Get descriptor of client.
+	clientSocket = ((Tcp*)mySocket)->acceptClient();
+	size = clientSocket->reciveData(buffer, BUFFSIZE);
+	drv = Server::deSerializeObj<Driver>(buffer, size);
+	//Create the new remote driver.
+	currentDriver = new RemoteDriver(drv, clientSocket);
+	//Remote driver saved all of the driver's data so delete the driver.
+	delete drv;
+	//Add the RemoteDriver to the TaxiCenter.
+	//We will lock before adding to prevent severe cases.
+	pthread_mutex_lock(&lock);
+	//Decrease the number of threads to know we got the client.
+	running_threads--;
+	myCenter->addDriver(currentDriver);
+	pthread_mutex_unlock(&lock);
+	//Destroy the mutex lock.
+	pthread_mutex_destroy(&lock);
+
 }
 
 template<class T>
