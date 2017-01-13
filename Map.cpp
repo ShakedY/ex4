@@ -8,7 +8,7 @@ using namespace std;
 Map::Map(unsigned int width, unsigned int height, list<BFSPoint*>& obstacles)
 {
 	bool flag = false;
-	if (width <= 10 && height <= 10)
+	if (width <= SIZE && height <= SIZE)
 	{
 		if (width > 0 && height > 0)
 		{
@@ -72,7 +72,7 @@ Map::Map(unsigned int width, unsigned int height, list<BFSPoint*>& obstacles)
 
 Map::Map(unsigned int width, unsigned int height, list<Point>& obstacles)
 {
-	if (width <= 10 && height <= 10)
+	if (width <= SIZE && height <= SIZE)
 	{
 		if (width > 0 && height > 0)
 		{
@@ -167,7 +167,7 @@ Map::Map(unsigned int width, unsigned int height, list<Point>& obstacles)
 
 Map::Map(unsigned int width, unsigned int height)
 {
-	if (width <= 10 && height <= 10)
+	if (width <= SIZE && height <= SIZE)
 	{
 		if (width > 0 && height > 0)
 		{
