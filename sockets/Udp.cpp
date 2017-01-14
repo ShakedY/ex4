@@ -13,9 +13,10 @@
 * The output: none										               *
 * The Function operation: creating new Udp socket						       *
 ***********************************************************************/
-Udp::Udp(bool isServers, int port_num) {
+Udp::Udp(bool isServers, int port_num,string ip):Socket(ip) {
 	this->port_number = port_num;
 	this->isServer = isServers;
+
 }
 
 /***********************************************************************
@@ -77,14 +78,34 @@ int Udp::sendData(string data) {
 	//send
 	int sent_bytes = sendto(this->socketDescriptor,
 			datas, data_len, 0, (struct sockaddr *) &sin, sizeof(sin));
-//	cout << sent_bytes << endl;
 	//check if send successfully
 	if (sent_bytes < 0) {
+		cout <<"Error in send" << endl;
 		return ERROR_SEND;
 	}
 	//return correct if there were no problems
 	return CORRECT;
 }
+
+int Udp::sendData(char action) {
+	//initialize the struct
+	struct sockaddr_in sin;
+	memset(&sin, 0, sizeof(sin));
+	sin.sin_family = AF_INET;
+	sin.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
+	sin.sin_port = htons(this->port_number);
+	//send
+	int sent_bytes = sendto(this->socketDescriptor,
+			&action, 1, 0, (struct sockaddr *) &sin, sizeof(sin));
+	//check if send successfully
+	if (sent_bytes < 0) {
+		cout <<"Error in send" << endl;
+		return ERROR_SEND;
+	}
+	//return correct if there were no problems
+	return CORRECT;
+}
+
 /***********************************************************************
 * function name: recive	`											   *
 * The Input: none										               *

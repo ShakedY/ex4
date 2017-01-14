@@ -103,9 +103,14 @@ public:
 	 * Tcp is code blocking.It will get a mutex lock which we
 	 * will use as a parameter and when it will connect with the client it will
 	 *  create the RemoteDriver and add it carefully to the TaxiCenter via the Server
-	 *  by using the lock.
+	 *  by using the lock. After the run of the accept the main thread will know to
+	 *  continue because we have a counter that will indicate it for him and this
+	 *  function will continue managing it's specific client in it's own thread and
+	 *  the main thread will be able to comunicate with the other threads by updating
+	 *  a global data structure.
 	 */
 	static void* manageClient(void* param);
+	static void waitForTrip(Driver* driver);
 };
 
 #endif /* SERVER_H_ */

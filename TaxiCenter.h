@@ -8,6 +8,7 @@
 #ifndef SRC_TAXICENTER_H_
 #define SRC_TAXICENTER_H_
 #include <list>
+#include <pthread.h>
 #include "BFSObject.h"
 #include "BFSPoint.h"
 #include "Cab.h"
@@ -15,6 +16,8 @@
 #include "Trip.h"
 #include "Passenger.h"
 #include "Driver.h"
+#include "GlobalInfo.h"
+#include "TripsCalcThread.h"
 class Trip;
 class Driver;
 class Passenger;
@@ -56,6 +59,10 @@ private:
 		}
 		;
 public:
+	/*struct Calculation {
+		Trip* myTrip;
+		Map* myMap;
+	};*/
 	static TaxiCenter* getInstance(Map *m = NULL);
 	/*
 	 * Destructor of the TaxiCenter,it will delete all of the drivers,cabs and trips
@@ -130,6 +137,7 @@ public:
 
 	// like a list of worker at an company
 	std::list<const Driver*>* getDrivers() const;
+	static void* setRoadFromThread(void* param);
 };
 
 #endif /* SRC_TAXICENTER_H_ */

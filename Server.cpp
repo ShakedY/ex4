@@ -40,8 +40,10 @@ Trip* Server::createTrip(StringInput::TripInfo tripInfo)
 void Server::createMap(StringInput& info)
 {
 	//Create a new map based on the info entered in StringInfo.
-	map = new Map(info.gridInfo.width, info.gridInfo.height,
+	list<Point> obstacles = *(info.gridInfo.obstacles);
+	map = Map::getInstance(info.gridInfo.width, info.gridInfo.height,
 			*(info.gridInfo.obstacles));
+	cout <<"Created map." << endl;
 }
 
 void Server::mainLoop(StringInput& info)
@@ -105,6 +107,8 @@ void Server::getNumDrivers()
 	Param* currentStruct;
 	//Scan the number of drivers from the console.
 	scanf("%d", &numDrivers);
+	//Create the global info(TODO make it in another location).
+	GlobalInfo* global = GlobalInfo::getInstance(numDrivers);
 	running_threads = numDrivers;
 	//Now we expect to get the drivers through the socket and send them cabs.
 	while (numDrivers-- != 0)
@@ -120,13 +124,12 @@ void Server::getNumDrivers()
 		thread = pthread_create(&currentThread,NULL,Server::manageClient
 							,currentStruct);
 	}
-	//Wait for all the threads to end by sleeping.
+	//Wait for all the threads to accept all the clients.
 	while (running_threads > 0) {
 		sleep(1);
 	}
+	//cout <<"Ended accepting client." << endl;
 	center->attachCabsToDrivers();
-	// sending the clients trips
-	center->attachDriversToTrips();
 }
 
 void* Server::manageClient(void * params) {
@@ -139,8 +142,10 @@ void* Server::manageClient(void * params) {
 	int size;
 	char buffer[BUFFSIZE];
 	RemoteDriver* currentDriver;
+	GlobalInfo* global = GlobalInfo::getInstance();
 	//Get descriptor of client.
 	clientSocket = ((Tcp*)mySocket)->acceptClient();
+	//cout <<"Accepted the client." << endl;
 	size = clientSocket->reciveData(buffer, BUFFSIZE);
 	drv = Server::deSerializeObj<Driver>(buffer, size);
 	//Create the new remote driver.
@@ -154,8 +159,42 @@ void* Server::manageClient(void * params) {
 	running_threads--;
 	myCenter->addDriver(currentDriver);
 	pthread_mutex_unlock(&lock);
+	//Now we will wait until there is a cab to send.
+	//cout <<"Started waiting for the cab." << endl;
+	//cout <<"Driver's id is: " << currentDriver->getId() << endl;
+	while (global->getIthCab(currentDriver->getId()) == NULL) {
+		//Loop until there is a cab.
+		sleep(1);
+	}
+	//There is a cab we will aply it to the RemoteDriver.
+	//cout <<"Found the cab in driver with id:  "<< currentDriver->getId() << endl;
+	//cout <<"Cabs id: " << global->getIthCab(currentDriver->getId())->getCabId() << endl;
+	currentDriver->setCab(global->getIthCab(currentDriver->getId()));
+	//Set the pointer in the GlobalInfo to be null to prevent bugs.
+	global->setIthCab(currentDriver->getId(),NULL);
+	//Now we will wait for the trip,because there could be a lot of trips for a driver
+	//we will store the loop that waits for a trip in a function.
 	//Destroy the mutex lock.
+	waitForTrip(currentDriver);
 	pthread_mutex_destroy(&lock);
+
+}
+
+void Server::waitForTrip(Driver* driver) {
+	GlobalInfo* global = GlobalInfo::getInstance();
+	Trip* myTrip;
+	while (!global->getIthTrip(driver->getId())) {
+		//Sleep until there is a trip.
+		if (global->toExit()) {
+			return;
+		}
+		sleep(1);
+	}
+	//cout <<"Driver with id:  " << driver->getId() << "found a trip. " << endl;
+	myTrip = global->getIthTrip(driver->getId());
+	global->setIthTrip(driver->getId(),NULL);
+	driver->setTrip(myTrip);
+	Server::waitForTrip(driver);
 
 }
 

@@ -14,7 +14,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
-#define BUFFSIZE 32768
+#define BUFFSIZE (32768 * 16)
 
 using namespace std;
 using namespace boost::archive;

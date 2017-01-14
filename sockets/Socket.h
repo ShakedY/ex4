@@ -48,7 +48,7 @@ public:
 	* The output: none										               *
 	* The Function operation: creating new Socket object			       *
 	***********************************************************************/
-	Socket();
+	Socket(string ip);
 	/***********************************************************************
 	* function name: ~Socket											   *
 	* The Input: none													   *
@@ -72,6 +72,14 @@ public:
 	* who connect to this socket. pure virtual method					   *
 	***********************************************************************/
 	virtual int sendData(string data) = 0;
+	/***********************************************************************
+	* function name: sendData											   *
+	* The Input: a char representing the data to send		               *
+	* The output: int number representing the return status		           *
+	* The Function operation: sending the input data to the socket         *
+	* who connect to this socket.										   *
+	***********************************************************************/
+	virtual int sendData(char data) = 0;
 	/***********************************************************************
 	* function name: recive	`											   *
 	* The Input: none										               *
