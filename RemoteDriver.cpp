@@ -54,6 +54,7 @@ T* RemoteDriver::deSerializeObj(const char* serial_str, int size)
 
 void RemoteDriver::setCab(Cab* cab)
 {
+	//cout <<"In remote driver sending the cab. " << endl;
 	myCab = cab;
 	soc->sendData(serializeObj(cab));
 }

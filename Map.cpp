@@ -4,6 +4,14 @@
 #include <stdlib.h>
 #include <stdexcept>
 using namespace std;
+Map* Map::instance = NULL;
+
+Map* Map::getInstance(unsigned int width,unsigned int height,list<Point> obstacles) {
+	if (!instance) {
+		instance = new Map(width,height,obstacles);
+	}
+	return instance;
+}
 
 Map::Map(unsigned int width, unsigned int height, list<BFSPoint*>& obstacles)
 {
@@ -12,6 +20,7 @@ Map::Map(unsigned int width, unsigned int height, list<BFSPoint*>& obstacles)
 	{
 		if (width > 0 && height > 0)
 		{
+			//cout <<"Here setting dimX and dimY to be:  " << width << "  " << height << endl;
 			dimX = width;
 			dimY = height;
 		}
@@ -70,12 +79,13 @@ Map::Map(unsigned int width, unsigned int height, list<BFSPoint*>& obstacles)
 	}
 }
 
-Map::Map(unsigned int width, unsigned int height, list<Point>& obstacles)
+Map::Map(unsigned int width, unsigned int height, list<Point> obstacles)
 {
 	if (width <= SIZE && height <= SIZE)
 	{
 		if (width > 0 && height > 0)
 		{
+			//cout <<"Here setting dimX and dimY to be:  " << width << "  " << height << endl;
 			dimX = width;
 			dimY = height;
 		}
@@ -171,6 +181,7 @@ Map::Map(unsigned int width, unsigned int height)
 	{
 		if (width > 0 && height > 0)
 		{
+			//cout <<"Here setting dimX and dimY to be:  " << width << "  " << height << endl;
 			dimX = width;
 			dimY = height;
 		}
@@ -241,6 +252,7 @@ void Map::calculateShortestPath(list<const BFSPoint*>& path,
 void Map::calculateShortestPath(list<Point>& path,
 		const Point& source, const Point& destination)
 {
+	//cout <<"Here in calculateShortestPath." << endl;
 	BFSPoint *src = getLocationPrivate(source);
 	BFSObject *dst = (BFSObject*) getTheLocation(destination);
 	if (src->getDistance() != 0)
@@ -258,6 +270,7 @@ void Map::calculateShortestPath(list<Point>& path,
 
 const BFSPoint* Map::getTheLocation(unsigned x, unsigned y) const
 {
+	//cout <<"Here xdim and ydim is: " << dimX << "," << dimY << endl;
 	if (x >= dimX || y >= dimY)
 	{
 		throw invalid_argument("location not on the map");
@@ -272,6 +285,7 @@ BFSPoint* Map::getLocationPrivate(const BFSPoint& p)
 
 BFSPoint* Map::getLocationPrivate(const Point& p)
 {
+	//cout <<"Here xdim and ydim is: " << dimX << "," << dimY << endl;
 	unsigned int x = (unsigned) p.getX(), y = (unsigned) p.getY();
 	if (x >= dimX || y >= dimY)
 	{
@@ -282,6 +296,7 @@ BFSPoint* Map::getLocationPrivate(const Point& p)
 
 const BFSPoint* Map::getTheLocation(const Point& p) const
 {
+	//cout <<"Here xdim and ydim is: " << dimX << "," << dimY << endl;
 	unsigned int x = (unsigned) p.getX(), y = (unsigned) p.getY();
 	if (x >= dimX || y >= dimY)
 	{
@@ -293,4 +308,12 @@ const BFSPoint* Map::getTheLocation(const Point& p) const
 void Map::giveToAllMapUsersTheirDistanceFrom(unsigned x, unsigned y)
 {
 	grid[Y_AXIS_TO_INDEX(y, dimY)][x].BFS();
+}
+
+int Map::getWidth() {
+	return dimX;
+}
+
+int Map::getHeight() {
+	return dimY;
 }

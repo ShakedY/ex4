@@ -55,8 +55,20 @@ void TaxiCenter::addCab(Cab* cab)
 
 void TaxiCenter::addTrip(Trip* trip)
 {
-	//Set the road of this trip.
-	trip->setRoad(map);
+	//We wil open a thread to calculate the trip which we will join while attaching it.
+	pthread_t thread;
+	TripsCalcThread* calcThread = TripsCalcThread::getInstance();
+	//Set structure that we will hand to the function that is ran in the thread.
+	//Calculation* calc = new Calculation;
+	//cout <<"Width and height of map here:  " << map->getWidth() << "  " << map->getHeight() << endl;
+	//calc->myTrip = trip;
+	//calc->myMap = map;
+	//Calculate the trip by using the thread.
+	//cout <<"Created thread for calculation." << endl;
+	pthread_create(&thread,NULL,TaxiCenter::setRoadFromThread,trip);
+	calcThread->addTripId(trip->getId());
+	calcThread->addThread(thread);
+	//trip->setRoad(map);
 	//Make sure trips are sorted by starting time.
 	std::list<Trip*>::iterator it = trips.begin();
 	while (it != trips.end() && trip->getStartingTime() > (*it)->getStartingTime()) {
@@ -65,6 +77,14 @@ void TaxiCenter::addTrip(Trip* trip)
 	trips.insert(it,trip);
 }
 
+void* TaxiCenter::setRoadFromThread(void* param) {
+	//Calculation* calc = (Calculation*) param;
+	Trip* trip = (Trip*) param;
+	Map* map = Map::getInstance();
+	//cout <<"Width and height of map in THREAD:  " << map->getWidth() << "  " << map->getHeight() << endl;
+	//cout <<"Set road in thread." << endl;
+	trip->setRoad(map);
+}
 void TaxiCenter::addDrivers(list<Driver*> drivs)
 {
 	for (std::list<Driver*>::iterator it = drivs.begin(); it != drivs.end();
@@ -183,6 +203,7 @@ Cab* TaxiCenter::getCab(int cabId) const
 
 void TaxiCenter::attachCabsToDrivers()
 {
+	GlobalInfo* global = GlobalInfo::getInstance();
 	//Iterate through cabs and drivers and give cabs to drivers with no cab.
 	for (std::list<Cab*>::iterator itCabs = cabs.begin(); itCabs != cabs.end();
 			++itCabs)
@@ -192,7 +213,9 @@ void TaxiCenter::attachCabsToDrivers()
 		{
 			if ((*it)->hasCab() == false)
 			{
-				(*it)->setCab((*itCabs));
+				//cout <<"Setting cab for driver with id: " << (*it)->getId() << endl;
+				global->setIthCab((*it)->getId(),(*itCabs));
+				//(*it)->setCab((*itCabs));
 			}
 		}
 	}
@@ -200,7 +223,9 @@ void TaxiCenter::attachCabsToDrivers()
 
 void TaxiCenter::attachDriversToTrips()
 {
+	GlobalInfo* global = GlobalInfo::getInstance();
 	std::list<Driver*>::iterator it = drivers.begin(), end = drivers.end();
+	TripsCalcThread* calcThread = TripsCalcThread::getInstance();
 	unsigned int size = trips.size();
 	Trip* currentTrip;
 	while (size > 0)
@@ -216,8 +241,11 @@ void TaxiCenter::attachDriversToTrips()
 		{
 			if ((*it)->hasCab() && (*it)->isAvailable())
 			{
+				//Before setting the trip make sure the thread ends by calling join.
+				pthread_join(calcThread->getThreadOfTrip(currentTrip->getId()),NULL);
 				// If there is a driver with a cab and no trip assign the trip.
-				(*it)->setTrip(currentTrip);
+				global->setIthTrip((*it)->getId(),currentTrip);
+				//(*it)->setTrip(currentTrip);
 				trips.pop_front();
 				size--;
 				// the trip was assigned, we need to break the loop.
@@ -229,6 +257,8 @@ void TaxiCenter::attachDriversToTrips()
 
 void TaxiCenter::endWorking()
 {
+	GlobalInfo* global =  GlobalInfo::getInstance();
+	global->endThreads();
 	//Iterate through all the drivers and tell them to stop working.
 	for (std::list<Driver*>::iterator itDrivers = drivers.begin();
 			itDrivers != drivers.end(); ++itDrivers)

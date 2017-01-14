@@ -25,18 +25,22 @@ private:
 	 * like the array columns. */
 	BFSPoint grid[SIZE][SIZE];
 	std::list<BFSPoint*> obstacles;
+	Map() :
+				dimX(0), dimY(0)
+		{
+		}
+		;
+		Map(unsigned int witdh, unsigned int height, std::list<BFSPoint*>& obstacles);
+		Map(unsigned int witdh, unsigned int height, std::list<Point> obstacles);
+		Map(unsigned int witdh, unsigned int height);
+	static Map* instance;
 protected:
 	BFSPoint* getLocationPrivate(const BFSPoint& p);
 	BFSPoint* getLocationPrivate(const Point& p);
+
 public:
-	Map() :
-			dimX(0), dimY(0)
-	{
-	}
-	;
-	Map(unsigned int witdh, unsigned int height, std::list<BFSPoint*>& obstacles);
-	Map(unsigned int witdh, unsigned int height, std::list<Point>& obstacles);
-	Map(unsigned int witdh, unsigned int height);
+	static Map* getInstance(unsigned int width = 0,unsigned int height = 0,
+			std::list<Point> obstacles = std::list<Point>());
 	virtual ~Map()
 	{
 	};
@@ -50,6 +54,8 @@ public:
 	const BFSPoint* getTheLocation(unsigned x, unsigned y) const;
 	const BFSPoint* getTheLocation(const Point& p) const;
 	void giveToAllMapUsersTheirDistanceFrom(unsigned x, unsigned y);
+	int getWidth();
+	int getHeight();
 };
 
 #endif /* SRC_MAP_H_ */
